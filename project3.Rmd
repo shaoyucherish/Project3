@@ -24,6 +24,8 @@ library(tidyverse)
 library(dplyr)
 library(caret)
 library(ggplot2)
+library(corrplot)
+library(GGally)
 ```
 
 # Introduction
@@ -73,6 +75,11 @@ newsTrain
 Some basic summary statistics and plots about the training data.
 ```{r}
 summary(newsTrain)
+```
+
+```{r}
+#numerical summary for our Y variable shares
+summary(newsTrain$shares)
 ```
 
 ```{r}
@@ -126,6 +133,39 @@ g + geom_point() + labs()
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
 g + geom_point() + labs()
 ```
+
+Plotting the correlation between numeric variables.
+```{r}
+correlation <- cor(newsTrain %>% select(-publish_weekday), method = "spearman")
+corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 0.5, mar = c(2, 0, 1, 0)) 
+corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
+```
+
+
+
+
+Select predictors.
+```{r}
+train <- newsTrain %>% select()
+test <- newsTest %>% select()
+```
+
+# Model
+
+## Linear Regression Model
+```{r}
+set.seed(111)
+lrFit <- train(shares ~ num_imgs + num_videos, data = newsTrain,
+               method = "lm",
+               trControl = trainControl(method = "cv", number = 5))
+lrFit
+```
+
+
+## Random Forest Model
+
+
+## Boosted Tree Model
 
 
 
