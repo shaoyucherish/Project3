@@ -1,33 +1,147 @@
 ---
 title: "Project 3"
 author: "Shaoyu Wang"
-date: "2022-10-30"
+date: "2022-11-09"
 output: 
   github_document: default
   html_document:
     code_folding: hide
+params:
+    columnName: ""
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-## R Markdown
+# Required Packages
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+The following packages are required for this project:
+```{r}
+# Load libraries
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(caret)
+library(ggplot2)
 ```
 
-## Including Plots
+# Introduction
 
-You can also embed plots, for example:
+This [online News Popularity Data Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+# Data
+
+Use a relative path to import the data and subset the data to work on the data channel of interest.
+
+```{r}
+#Read in the data file
+newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
+#Choose the data channel of interest
+if (params$columnName != "") {
+  paramColumnNameType <- params$columnName
+} else {
+  paramColumnNameType <- "tech"
+}
+columnName <- paste("data_channel_is_", paramColumnNameType, sep = "")
+#Merge the weekdays columns channels as one single column.
+news <- newsData %>% 
+  filter(.data[[columnName]] == 1) %>% 
+  select(url, starts_with("weekday_is_")) %>% 
+  pivot_longer(-url) %>% 
+  filter(value != 0) %>% 
+  mutate(publish_weekday = substr(name, 12, 20)) %>% 
+  left_join(newsData, by = "url") %>% 
+#Remove non predictive variables
+  select(-c(url, name, value, timedelta, starts_with("data_channel_is_"), starts_with("weekday_is_")))
+news$publish_weekday <- as.factor(news$publish_weekday)
+news
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Split the data into a training set and a test set.
+```{r}
+set.seed(111)
+trainIndex <- createDataPartition(news$shares, p = 0.7, list = FALSE)
+newsTrain <- news[trainIndex,]
+newsTest <- news[-trainIndex,]
+newsTrain
+```
+
+# Summarizations
+
+Some basic summary statistics and plots about the training data.
+```{r}
+summary(newsTrain)
+```
+
+```{r}
+#Numerical summaries
+newsTrain %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+newsTrain %>% 
+  group_by(publish_weekday) %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+newsTrain %>% 
+  group_by(num_imgs) %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+newsTrain %>% 
+  group_by(num_videos) %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+newsTrain %>% 
+  group_by(num_keywords) %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+```
+
+```{r}
+#Contingency tables
+table(newsTrain$publish_weekday)
+```
+
+```{r}
+g <- ggplot(newsTrain, aes(x = n_tokens_title))
+g + geom_histogram(fill = "lightblue", binwidth = 1) + labs()
+```
+```{r}
+g <- ggplot(newsTrain, aes(x = n_tokens_content))
+g + geom_histogram(fill = "lightblue") + labs()
+```
+
+```{r}
+g <- ggplot(newsTrain, aes(x = global_subjectivity))
+g + geom_histogram(fill = "lightblue") + labs()
+```
+
+```{r}
+g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
+g + geom_histogram(fill = "lightblue") + labs()
+```
+
+```{r}
+g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
+g + geom_point() + labs()
+```
+
+```{r}
+g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
+g + geom_point() + labs()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
