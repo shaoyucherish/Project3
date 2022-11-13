@@ -172,7 +172,7 @@ g + geom_col(fill = "lightblue")+
 
 Plot between number of images and number of shares: 
 ```{r}
-g + ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
+g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
 g + geom_point(color = "blue") +
   labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
 ```
@@ -186,6 +186,7 @@ corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", nu
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares
 ```{r}
+set.seed(111)
 Train <- newsTrain %>% 
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
 Test <- newsTest %>% 
@@ -200,7 +201,9 @@ set.seed(111)
 lrFit <- train(shares ~ ., data = Train,
                method = "lm",
                trControl = trainControl(method = "cv", number = 5))
-lrFit
+#lrFit
+predict_lrFit <- predict(lrFit, newdata = Test)
+postResample(predict_lrFit, obs = Test$shares)
 ```
 
 ## Random Forest Model
@@ -212,13 +215,33 @@ rfFit <- train(shares ~ .,
                          preProcess = c("center","scale"),
                          trControl = trainControl(method = "cv", number = 5),
                          tuneGrid = data.frame(mtry = ncol(Train)/3))
-rfFit
+#rfFit
+predict_rfFit <- predict(rfFit, newdata = Test)
+postResample(predict_rfFit, obs = Test$shares)
 ```
 
 
 ## Boosted Tree Model
 
 
+```{r}
+
+## Boosted Tree Model
+
+set.seed(111)
+boostedfit <- train(shares ~ ., 
+           data = Train, 
+           method = "gbm", 
+           preProcess = c("center", "scale"),
+           trControl = trainControl(method = "cv", number = 5),
+           tuneGrid = expand.grid(n.trees = c(25,50,100,150,200), 
+                      interaction.depth = c(1,2,3,4), 
+                      shrinkage = 0.1, 
+                      n.minobsinnode = 10)
+            )
+predict_boostedfit <- predict(boostedfit, newdata = Test)
+postResample(predict_boostedfit, obs = Test$shares)
+```
 
 
 
