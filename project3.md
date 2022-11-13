@@ -3,13 +3,6 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-14
 
-``` r
-rmarkdown::render("project3.Rmd", 
-                  output_format = "github_document",
-                  output_file = "README.md",
-                  output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
-```
-
 # Introduction
 
 This [online News Popularity Data

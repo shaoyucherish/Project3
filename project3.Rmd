@@ -11,7 +11,7 @@ params:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-```{r, eval=FALSE}
+```{r, include=FALSE, eval=FALSE}
 rmarkdown::render("project3.Rmd", 
                   output_format = "github_document",
                   output_file = "README.md",
