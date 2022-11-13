@@ -1,20 +1,29 @@
 ---
 title: "Project 3"
-author: "Shaoyu Wang,Aniket Walimbe"
-date: "2022-11-09"
-output: 
-  github_document
-params:
-    columnName: ""
+author: "Shaoyu Wang, Aniket Walimbe"
+date: "2022-11-14"
+output: github_document
+params: 
+  channel: ""
 ---
+
+rmarkdown::render("project3.Rmd", 
+                  output_format = "github_document",
+                  output_file = "README.md",
+                  output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
+# Introduction
+
+This [online News Popularity Data Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years.
+
 # Required Packages
 
-The following packages are required for this project:
+First, we will load the required packages:
+
 ```{r}
 # Load libraries
 library(readr)
@@ -27,11 +36,6 @@ library(GGally)
 library(randomForest)
 ```
 
-# Introduction
-
-This [online News Popularity Data Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years.
-
-
 # Data
 
 Use a relative path to import the data and subset the data to work on the data channel of interest.
@@ -40,15 +44,15 @@ Use a relative path to import the data and subset the data to work on the data c
 #Read in the data file
 newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
 #Choose the data channel of interest
-if (params$columnName != "") {
-  paramColumnNameType <- params$columnName
+if (params$channel != "") {
+  paramChannelName <- params$channel
 } else {
-  paramColumnNameType <- "lifestyle"
+  paramChannelName <- "lifestyle"
 }
-columnName <- paste("data_channel_is_", paramColumnNameType, sep = "")
+channel <- paste("data_channel_is_", paramChannelName, sep = "")
 #Merge the weekdays columns channels as one single column.
 news <- newsData %>% 
-  filter(.data[[columnName]] == 1) %>% 
+  filter(.data[[channel]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -103,8 +107,9 @@ newsTrain %>%
 Contingency tables : Here, the title subjectivity is divided into 3 categories : high, medium and low based on the values. If the value is greater than 0.8, it is high, greater than 0.4 and less than 0.8 is medium and remaining is low. The contingency table is then shown below. 
 
 ```{r}
-newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "High", ifelse(newsTrain$title_subjectivity >= 0.4, "Medium",
-ifelse(airquality$Wind >= 0, "Low", "None")))
+newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "High", 
+                                          ifelse(newsTrain$title_subjectivity >= 0.4, "Medium",
+                                                 ifelse(airquality$Wind >= 0, "Low", "None")))
 table(newsTrain$subject_activity_type)
 ```
 
@@ -173,13 +178,13 @@ g + geom_col(fill = "lightblue")+
 Plot between number of images and number of shares: 
 ```{r}
 g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
-g + geom_point(color = "blue") +
+g + geom_point() +
   labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
 ```
 
 Plotting the correlation between numeric variables.
 ```{r}
-correlation <- cor(newsTrain %>% select(-publish_weekday), method = "spearman")
+correlation <- cor(newsTrain %>% select(-c(publish_weekday, subject_activity_type)), method = "spearman")
 corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 0.5, mar = c(2, 0, 1, 0)) 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
@@ -225,22 +230,19 @@ postResample(predict_rfFit, obs = Test$shares)
 
 
 ```{r}
-
-## Boosted Tree Model
-
+#Boosted Tree Model
 set.seed(111)
-boostedfit <- train(shares ~ ., 
-           data = Train, 
-           method = "gbm", 
-           preProcess = c("center", "scale"),
-           trControl = trainControl(method = "cv", number = 5),
-           tuneGrid = expand.grid(n.trees = c(25,50,100,150,200), 
-                      interaction.depth = c(1,2,3,4), 
-                      shrinkage = 0.1, 
-                      n.minobsinnode = 10)
-            )
-predict_boostedfit <- predict(boostedfit, newdata = Test)
-postResample(predict_boostedfit, obs = Test$shares)
+boostedFit <- train(shares ~ ., 
+                    data = Train, 
+                    method = "gbm", 
+                    preProcess = c("center", "scale"),
+                    trControl = trainControl(method = "cv", number = 5),
+                    tuneGrid = expand.grid(n.trees = c(25,50,100,150,200), 
+                                           interaction.depth = c(1,2,3,4), 
+                                           shrinkage = 0.1, 
+                                           n.minobsinnode = 10))
+predict_boostedFit <- predict(boostedFit, newdata = Test)
+postResample(predict_boostedFit, obs = Test$shares)
 ```
 
 
