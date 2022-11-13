@@ -3,9 +3,7 @@ title: "Project 3"
 author: "Shaoyu Wang,Aniket Walimbe"
 date: "2022-11-09"
 output: 
-  github_document: default
-  html_document:
-    code_folding: hide
+  github_document
 params:
     columnName: ""
 ---
