@@ -210,7 +210,7 @@ rfFit <- train(shares ~ .,
                          tuneGrid = data.frame(mtry = ncol(Train)/3))
 rfFit
 ```
-
+summary
 
 ## Boosted Tree Model
 
