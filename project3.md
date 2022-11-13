@@ -112,6 +112,8 @@ newsTrain
 
 Some basic summary statistics and plots about the training data.
 
+## Tables
+
 ``` r
 #summary for training data
 summary(newsTrain)
@@ -336,8 +338,6 @@ newsTrain %>%
     ## 7            9  3857  5590   1900  2900
     ## 8           10  4026 12375   1600  2100
 
-# Contingency tables
-
 Contingency tables : Here, the title subjectivity is divided into 3
 categories : high, medium and low based on the values. If the value is
 greater than 0.8, it is high, greater than 0.4 and less than 0.8 is
@@ -361,6 +361,8 @@ table(newsTrain$publish_weekday)
     ## 
     ##    friday    monday  saturday    sunday  thursday   tuesday wednesday 
     ##       208       221       133       135       254       240       281
+
+## Plots
 
 ``` r
 g <- ggplot(newsTrain, aes(x = n_tokens_title))
