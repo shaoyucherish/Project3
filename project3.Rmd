@@ -79,6 +79,8 @@ newsTrain
 # Summarizations
 
 Some basic summary statistics and plots about the training data.
+
+## Tables
 ```{r}
 #summary for training data
 summary(newsTrain)
@@ -112,7 +114,6 @@ newsTrain %>%
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
-# Contingency tables
 Contingency tables : Here, the title subjectivity is divided into 3 categories : high, medium and low based on the values. If the value is greater than 0.8, it is high, greater than 0.4 and less than 0.8 is medium and remaining is low. The contingency table is then shown below. 
 
 ```{r}
@@ -126,6 +127,8 @@ table(newsTrain$subject_activity_type)
 ```{r}
 table(newsTrain$publish_weekday)
 ```
+
+## Plots
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = n_tokens_title))
