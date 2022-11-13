@@ -289,7 +289,7 @@ boostedFit <- train(shares ~ .,
 boostedFit
 ```
 
-## Comparison
+# Comparison
 
 All the models are compared by RMSE on the test set
 

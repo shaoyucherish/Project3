@@ -610,6 +610,7 @@ Packages</a></li>
 <li><a href="#data" id="toc-data">Data</a></li>
 <li><a href="#summarizations" id="toc-summarizations">Summarizations</a></li>
 <li><a href="#model" id="toc-model">Model</a></li>
+<li><a href="#comparison" id="toc-comparison">Comparison</a></li>
 </ul>
 <h1 id="introduction">Introduction</h1>
 <p>This <a href="https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity">online
@@ -1021,7 +1022,7 @@ title_subjectivity, shares.</p>
 ##  constant at a value of 10
 ## RMSE was used to select the optimal model using the smallest value.
 ## The final values used for the model were n.trees = 25, interaction.depth = 1, shrinkage = 0.1 and n.minobsinnode = 10.</code></pre>
-<h2 id="comparison">Comparison</h2>
+<h1 id="comparison">Comparison</h1>
 <p>All the models are compared by RMSE on the test set</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#pred_Fit2 &lt;- predict(lrFit_2, newdata = Test)</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>fit2_mod <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="fu">predict</span>(lrFit_2, <span class="at">newdata =</span> Test), <span class="at">obs =</span> Test<span class="sc">$</span>shares)</span>

@@ -9,6 +9,7 @@ Shaoyu Wang, Aniket Walimbe
 -   <a href="#data" id="toc-data">Data</a>
 -   <a href="#summarizations" id="toc-summarizations">Summarizations</a>
 -   <a href="#model" id="toc-model">Model</a>
+-   <a href="#comparison" id="toc-comparison">Comparison</a>
 
 # Introduction
 
@@ -549,7 +550,7 @@ boostedFit
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final values used for the model were n.trees = 25, interaction.depth = 1, shrinkage = 0.1 and n.minobsinnode = 10.
 
-## Comparison
+# Comparison
 
 All the models are compared by RMSE on the test set
 

@@ -718,7 +718,7 @@ boostedFit
     ## The final values used for the model were n.trees = 25, interaction.depth =
     ##  1, shrinkage = 0.1 and n.minobsinnode = 10.
 
-## Comparison
+# Comparison
 
 All the models are compared by RMSE on the test set
 
