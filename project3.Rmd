@@ -154,7 +154,7 @@ g + geom_point() +
 Plot between title subjectivity and number of shares: We can inspect the trend of the shares as a function of title subjectivity. 
 ```{r}
 g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
-g + geom_point(color = "blue") + 
+g + geom_point() + 
   labs(x = "Title subjectivity" , y = "Number of shares", title = "Scatter Plot : Title Subjectivity Vs Number of Shares") 
 
 ```
@@ -167,8 +167,8 @@ newsTrainday <- newsTrain %>%
   summarise(total_shares=sum(shares))
 
 
-g + ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))
-g + geom_col(color = "blue")+
+g <- ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))
+g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on days")
 ```
 
