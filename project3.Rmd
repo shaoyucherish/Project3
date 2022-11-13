@@ -32,6 +32,7 @@ library(readr)
 library(tidyverse)
 library(dplyr)
 library(caret)
+library(leaps)
 library(ggplot2)
 library(corrplot)
 library(GGally)
@@ -79,30 +80,36 @@ newsTrain
 
 Some basic summary statistics and plots about the training data.
 ```{r}
+#summary for training data
 summary(newsTrain)
 ```
 
 ```{r}
 #numerical summary for our Y variable shares
 summary(newsTrain$shares)
+newsTrain %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
 ```{r}
-#Numerical summaries
-newsTrain %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+#numerical summaries on subgroups
 newsTrain %>% 
   group_by(publish_weekday) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 newsTrain %>% 
   group_by(num_imgs) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 newsTrain %>% 
   group_by(num_videos) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 newsTrain %>% 
   group_by(num_keywords) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
 # Contingency tables
@@ -171,10 +178,9 @@ newsTrainday <- newsTrain %>%
   group_by(publish_weekday) %>% 
   summarise(total_shares=sum(shares))
 
-
 g <- ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))
 g + geom_col(fill = "lightblue")+
-  labs(title = " Shares for articles published based on days")
+  labs(title = " Shares for articles published based on weekdays")
 ```
 
 Plot between number of images and number of shares: 
@@ -191,48 +197,81 @@ corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-Select predictors: publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares
+Select predictors: publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares.
+
 ```{r}
 set.seed(111)
 Train <- newsTrain %>% 
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
 Test <- newsTest %>% 
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+Train
 ```
 
 # Model
 
 ## Linear Regression Model
+
 ```{r}
+#forward stepwise
+set.seed(111)
+fwFit <- train(shares ~ ., data = Train,
+                   method = "leapForward",
+                   preProcess = c("center", "scale"))
+fwFit
+#summary(fwFit)
+```
+
+```{r}
+#backward stepwise
+set.seed(111)
+bwFit <- train(shares ~ ., data = Train,
+                   method = "leapBackward",
+                   preProcess = c("center", "scale"))
+bwFit
+#summary(bwFit)
+```
+```{r}
+#fit a linear regression model with 2 predictors: num_videos, kw_avg_avg
+set.seed(111)
+lrFit_2 <- train(shares ~ num_videos + kw_avg_avg, data = Train,
+               method = "lm",
+               trControl = trainControl(method = "cv", number = 5))
+lrFit_2
+```
+
+```{r}
+#fit a linear regression model with 3 predictors: n_tokens_content, num_videos, kw_avg_avg
+set.seed(111)
+lrFit_3 <- train(shares ~ n_tokens_content + num_videos + kw_avg_avg, data = Train,
+               method = "lm",
+               trControl = trainControl(method = "cv", number = 5))
+lrFit_3
+```
+
+```{r}
+#fit a linear regression model with all predictors
 set.seed(111)
 lrFit <- train(shares ~ ., data = Train,
                method = "lm",
                trControl = trainControl(method = "cv", number = 5))
-#lrFit
-predict_lrFit <- predict(lrFit, newdata = Test)
-postResample(predict_lrFit, obs = Test$shares)
+lrFit
 ```
 
 ## Random Forest Model
 ```{r}
 set.seed(111)
-rfFit <- train(shares ~ ., 
-                         data = Train, 
-                         method = "rf",
-                         preProcess = c("center","scale"),
-                         trControl = trainControl(method = "cv", number = 5),
-                         tuneGrid = data.frame(mtry = ncol(Train)/3))
-#rfFit
-predict_rfFit <- predict(rfFit, newdata = Test)
-postResample(predict_rfFit, obs = Test$shares)
+randomFit <- train(shares ~ ., 
+                   data = Train, 
+                   method = "rf",
+                   preProcess = c("center","scale"),
+                   trControl = trainControl(method = "cv", number = 5),
+                   tuneGrid = data.frame(mtry = ncol(Train)/3))
+randomFit
 ```
 
-
 ## Boosted Tree Model
-
-
 ```{r}
-#Boosted Tree Model
 set.seed(111)
 boostedFit <- train(shares ~ ., 
                     data = Train, 
@@ -242,15 +281,42 @@ boostedFit <- train(shares ~ .,
                     tuneGrid = expand.grid(n.trees = c(25,50,100,150,200), 
                                            interaction.depth = c(1,2,3,4), 
                                            shrinkage = 0.1, 
-                                           n.minobsinnode = 10))
-predict_boostedFit <- predict(boostedFit, newdata = Test)
-postResample(predict_boostedFit, obs = Test$shares)
+                                           n.minobsinnode = 10),
+                    verbose = FALSE)
+boostedFit
 ```
 
+## Comparison
 
+All the models are compared by RMSE on the test set
 
-
-
+```{r}
+#pred_Fit2 <- predict(lrFit_2, newdata = Test)
+fit2_mod <- postResample(predict(lrFit_2, newdata = Test), obs = Test$shares)
+#pred_Fit3 <- predict(lrFit_3, newdata = Test)
+fit3_mod <- postResample(predict(lrFit_3, newdata = Test), obs = Test$shares)
+#fit a linear regression model
+#pred_lrFit <- predict(lrFit, newdata = Test)
+lr_mod <- postResample(predict(lrFit, newdata = Test), obs = Test$shares)
+#random forest
+#pred_randomFit <- predict(randomFit, newdata = Test)
+random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares)
+#boosted tree
+#pred_boostedFit <- predict(boostedFit, newdata = Test)
+boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
+#compare all models
+comparison <- tibble(model = c("LR with 2 predictors",
+                               "LR with 3 predictors",
+                               "LR with all predictors",
+                               "Random Forest",
+                               "Boosted Tree"), 
+                     RMSE = c(fit2_mod[1],
+                              fit3_mod[1],
+                              lr_mod[1],
+                              random_mod[1],
+                              boosted_mod[1]))
+comparison
+```
 
 
 
