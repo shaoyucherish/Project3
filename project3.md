@@ -737,16 +737,16 @@ random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares
 #pred_boostedFit <- predict(boostedFit, newdata = Test)
 boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
 #compare all models
-print(tibble(model = c("LR with 2 predictors",
-                       "LR with 3 predictors",
-                      "LR with all predictors",
-                      "Random Forest",
-                      "Boosted Tree"), 
-             RMSE = c(fit2_mod[1],
-                      fit3_mod[1],
-                      lr_mod[1],
-                      random_mod[1],
-                      boosted_mod[1])))
+tibble(model = c("LR with 2 predictors",
+                 "LR with 3 predictors",
+                 "LR with all predictors",
+                 "Random Forest",
+                 "Boosted Tree"), 
+       RMSE = c(fit2_mod[1],
+                fit3_mod[1],
+                lr_mod[1],
+                random_mod[1],
+                boosted_mod[1]))
 ```
 
     ## # A tibble: 5 × 2
