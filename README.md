@@ -8,8 +8,6 @@ Shaoyu Wang, Aniket Walimbe
     Packages</a>
 -   <a href="#data" id="toc-data">Data</a>
 -   <a href="#summarizations" id="toc-summarizations">Summarizations</a>
--   <a href="#contingency-tables" id="toc-contingency-tables">Contingency
-    tables</a>
 -   <a href="#model" id="toc-model">Model</a>
 
 # Introduction
@@ -78,6 +76,8 @@ newsTrain
 # Summarizations
 
 Some basic summary statistics and plots about the training data.
+
+## Tables
 
 ``` r
 #summary for training data
@@ -191,8 +191,6 @@ newsTrain %>%
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
-# Contingency tables
-
 Contingency tables : Here, the title subjectivity is divided into 3
 categories : high, medium and low based on the values. If the value is
 greater than 0.8, it is high, greater than 0.4 and less than 0.8 is
@@ -217,13 +215,15 @@ table(newsTrain$publish_weekday)
     ##    friday    monday  saturday    sunday  thursday   tuesday wednesday 
     ##       208       221       133       135       254       240       281
 
+## Plots
+
 ``` r
 g <- ggplot(newsTrain, aes(x = n_tokens_title))
 g + geom_histogram(fill = "lightblue", binwidth = 1) + 
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-130-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = n_tokens_content))
@@ -231,7 +231,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-131-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = global_subjectivity))
@@ -239,7 +239,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-132-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
@@ -247,7 +247,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-133-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
@@ -255,7 +255,7 @@ g + geom_point() +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-134-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
@@ -263,7 +263,7 @@ g + geom_point() +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-135-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Plot between title subjectivity and number of shares: We can inspect the
 trend of the shares as a function of title subjectivity.
@@ -274,7 +274,7 @@ g + geom_point() +
   labs(x = "Title subjectivity" , y = "Number of shares", title = "Scatter Plot : Title Subjectivity Vs Number of Shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-136-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Plot between number of shares and article published day: This plot shows
 the number of shares an article has based on the day it has been
@@ -291,7 +291,7 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-137-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Plot between number of images and number of shares:
 
@@ -301,7 +301,7 @@ g + geom_point() +
   labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-138-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 Plotting the correlation between numeric variables.
 
@@ -311,7 +311,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-139-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
 num_self_hrefs, num_videos, average_token_length, num_keywords,

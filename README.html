@@ -609,8 +609,6 @@ body {
 Packages</a></li>
 <li><a href="#data" id="toc-data">Data</a></li>
 <li><a href="#summarizations" id="toc-summarizations">Summarizations</a></li>
-<li><a href="#contingency-tables" id="toc-contingency-tables">Contingency
-tables</a></li>
 <li><a href="#model" id="toc-model">Model</a></li>
 </ul>
 <h1 id="introduction">Introduction</h1>
@@ -661,6 +659,7 @@ the data channel of interest.</p>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>newsTrain</span></code></pre></div>
 <h1 id="summarizations">Summarizations</h1>
 <p>Some basic summary statistics and plots about the training data.</p>
+<h2 id="tables">Tables</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#summary for training data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(newsTrain)</span></code></pre></div>
 <pre><code>##   publish_weekday n_tokens_title   n_tokens_content n_unique_tokens  n_non_stop_words n_non_stop_unique_tokens
@@ -759,7 +758,6 @@ the data channel of interest.</p>
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(num_keywords) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(shares), <span class="dv">0</span>), <span class="at">sd =</span> <span class="fu">round</span>(<span class="fu">sd</span>(shares), <span class="dv">0</span>), </span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">median =</span> <span class="fu">round</span>(<span class="fu">median</span>(shares), <span class="dv">0</span>), <span class="at">IQR =</span> <span class="fu">round</span>(<span class="fu">IQR</span>(shares), <span class="dv">0</span>))</span></code></pre></div>
-<h1 id="contingency-tables">Contingency tables</h1>
 <p>Contingency tables : Here, the title subjectivity is divided into 3
 categories : high, medium and low based on the values. If the value is
 greater than 0.8, it is high, greater than 0.4 and less than 0.8 is
@@ -776,6 +774,7 @@ below.</p>
 <pre><code>## 
 ##    friday    monday  saturday    sunday  thursday   tuesday wednesday 
 ##       208       221       133       135       254       240       281</code></pre>
+<h2 id="plots">Plots</h2>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(newsTrain, <span class="fu">aes</span>(<span class="at">x =</span> n_tokens_title))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>g <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>()</span></code></pre></div>
