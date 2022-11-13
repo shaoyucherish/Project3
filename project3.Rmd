@@ -26,6 +26,7 @@ library(caret)
 library(ggplot2)
 library(corrplot)
 library(GGally)
+library(randomForest)
 ```
 
 # Introduction
@@ -44,7 +45,7 @@ newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
 if (params$columnName != "") {
   paramColumnNameType <- params$columnName
 } else {
-  paramColumnNameType <- "tech"
+  paramColumnNameType <- "lifestyle"
 }
 columnName <- paste("data_channel_is_", paramColumnNameType, sep = "")
 #Merge the weekdays columns channels as one single column.
@@ -141,13 +142,12 @@ corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-
-
-
-Select predictors.
+Select predictors: publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares
 ```{r}
-train <- newsTrain %>% select()
-test <- newsTest %>% select()
+Train <- newsTrain %>% 
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+Test <- newsTest %>% 
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
 ```
 
 # Model
@@ -155,14 +155,23 @@ test <- newsTest %>% select()
 ## Linear Regression Model
 ```{r}
 set.seed(111)
-lrFit <- train(shares ~ num_imgs + num_videos, data = newsTrain,
+lrFit <- train(shares ~ ., data = Train,
                method = "lm",
                trControl = trainControl(method = "cv", number = 5))
 lrFit
 ```
 
-
 ## Random Forest Model
+```{r}
+set.seed(111)
+rfFit <- train(shares ~ ., 
+                         data = Train, 
+                         method = "rf",
+                         preProcess = c("center","scale"),
+                         trControl = trainControl(method = "cv", number = 5),
+                         tuneGrid = data.frame(mtry = ncol(Train)/3))
+rfFit
+```
 
 
 ## Boosted Tree Model
