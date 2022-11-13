@@ -1038,17 +1038,16 @@ title_subjectivity, shares.</p>
 <span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="co">#pred_boostedFit &lt;- predict(boostedFit, newdata = Test)</span></span>
 <span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>boosted_mod <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="fu">predict</span>(boostedFit, <span class="at">newdata =</span> Test), <span class="at">obs =</span> Test<span class="sc">$</span>shares)</span>
 <span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="co">#compare all models</span></span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;LR with 2 predictors&quot;</span>,</span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;LR with 3 predictors&quot;</span>,</span>
-<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;LR with all predictors&quot;</span>,</span>
-<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;Random Forest&quot;</span>,</span>
-<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;Boosted Tree&quot;</span>), </span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">RMSE =</span> <span class="fu">c</span>(fit2_mod[<span class="dv">1</span>],</span>
-<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>                              fit3_mod[<span class="dv">1</span>],</span>
-<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>                              lr_mod[<span class="dv">1</span>],</span>
-<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>                              random_mod[<span class="dv">1</span>],</span>
-<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>                              boosted_mod[<span class="dv">1</span>]))</span>
-<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>comparison</span></code></pre></div>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;LR with 2 predictors&quot;</span>,</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;LR with 3 predictors&quot;</span>,</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;LR with all predictors&quot;</span>,</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;Random Forest&quot;</span>,</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;Boosted Tree&quot;</span>), </span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">RMSE =</span> <span class="fu">c</span>(fit2_mod[<span class="dv">1</span>],</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>                fit3_mod[<span class="dv">1</span>],</span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>                lr_mod[<span class="dv">1</span>],</span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>                random_mod[<span class="dv">1</span>],</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>                boosted_mod[<span class="dv">1</span>]))</span></code></pre></div>
 
 </body>
 </html>
