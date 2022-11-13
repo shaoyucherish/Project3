@@ -117,43 +117,49 @@ table(newsTrain$publish_weekday)
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = n_tokens_title))
-g + geom_histogram(fill = "lightblue", binwidth = 1) + labs()
+g + geom_histogram(fill = "lightblue", binwidth = 1) + 
+  labs()
 ```
+
 ```{r}
 g <- ggplot(newsTrain, aes(x = n_tokens_content))
-g + geom_histogram(fill = "lightblue") + labs()
+g + geom_histogram(fill = "lightblue") + 
+  labs()
 ```
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = global_subjectivity))
-g + geom_histogram(fill = "lightblue") + labs()
+g + geom_histogram(fill = "lightblue") + 
+  labs()
 ```
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
-g + geom_histogram(fill = "lightblue") + labs()
+g + geom_histogram(fill = "lightblue") + 
+  labs()
 ```
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
-g + geom_point() + labs()
+g + geom_point() + 
+  labs()
 ```
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
-g + geom_point() + labs()
+g + geom_point() + 
+  labs()
 ```
 
-Plot between title subjectivity and number of shares :
-We can inspect the trend of the shares as a function of title subjectivity. 
+Plot between title subjectivity and number of shares: We can inspect the trend of the shares as a function of title subjectivity. 
 ```{r}
-ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares)) +
-  geom_point(color = "blue") +
+g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
+g + geom_point(color = "blue") + 
   labs(x = "Title subjectivity" , y = "Number of shares", title = "Scatter Plot : Title Subjectivity Vs Number of Shares") 
 
 ```
 
-Plot between number of shares and article published day : This plot shows the number of shares an article has based on the day it has been published.
+Plot between number of shares and article published day: This plot shows the number of shares an article has based on the day it has been published.
 ```{r}
 newsTrainday <- newsTrain %>%
   select(publish_weekday, shares) %>%
@@ -161,15 +167,15 @@ newsTrainday <- newsTrain %>%
   summarise(total_shares=sum(shares))
 
 
-ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares)) +
-  geom_col(color = "blue")+
+g + ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))
+g + geom_col(color = "blue")+
   labs(title = " Shares for articles published based on days")
 ```
-Plot between number of images and number of shares: 
 
+Plot between number of images and number of shares: 
 ```{r}
-ggplot(data = newsTrain, aes(x = num_imgs, y = shares)) +
-  geom_point(color = "blue") +
+g + ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
+g + geom_point(color = "blue") +
   labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
 ```
 
