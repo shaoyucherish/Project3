@@ -3,6 +3,7 @@
 "0","bwFit <- train(shares ~ ., data = Train,"
 "0","               method = ""leapBackward"","
 "0","               preProcess = c(""center"", ""scale""))"
+"0","#summary(bwFit)"
 "0","bwFit"
 "1","Linear Regression with Backwards Selection"
 "1"," "
@@ -75,4 +76,3 @@
 "1","The final value used for the model was nvmax = 2."
 "1","
 "
-"0","#summary(bwFit)"

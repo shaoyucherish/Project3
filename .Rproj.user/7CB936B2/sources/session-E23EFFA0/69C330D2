@@ -3,7 +3,7 @@
     "path": "~/Documents/R/repos/Project3/project3.Rmd",
     "project_path": "project3.Rmd",
     "type": "r_markdown",
-    "hash": "3205322416",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1668447934351.0,
@@ -12,16 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "314,80",
-        "scrollLine": "306",
+        "cursorPosition": "228,49",
+        "scrollLine": "210",
         "last_setup_crc32": "E23EFFA022e527f5"
     },
     "folds": "",
-    "lastKnownWriteTime": 1668449474,
+    "lastKnownWriteTime": 1668449653,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1668449474831,
+    "last_content_update": 1668449653806,
     "read_only": false,
     "read_only_alternatives": []
 }

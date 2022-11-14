@@ -461,6 +461,7 @@ set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
                method = "leapForward",
                preProcess = c("center", "scale"))
+#summary(fwFit)
 fwFit
 ```
 
@@ -482,10 +483,6 @@ fwFit
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 3.
 
-``` r
-#summary(fwFit)
-```
-
 Here, we have fitted a backward stepwise linear regression model for the
 training dataset having 15 variables. The data is centered and scaled
 and number of shares is the response variable.
@@ -496,6 +493,7 @@ set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
                method = "leapBackward",
                preProcess = c("center", "scale"))
+#summary(bwFit)
 bwFit
 ```
 
@@ -516,10 +514,6 @@ bwFit
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 2.
-
-``` r
-#summary(bwFit)
-```
 
 ``` r
 #fit a linear regression model with all predictors

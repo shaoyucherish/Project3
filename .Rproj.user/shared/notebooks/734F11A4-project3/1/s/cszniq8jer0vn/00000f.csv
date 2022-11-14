@@ -3,6 +3,7 @@
 "0","fwFit <- train(shares ~ ., data = Train,"
 "0","               method = ""leapForward"","
 "0","               preProcess = c(""center"", ""scale""))"
+"0","#summary(fwFit)"
 "0","fwFit"
 "1","Linear Regression with Forward Selection"
 "1"," "
@@ -75,4 +76,3 @@
 "1","The final value used for the model was nvmax = 3."
 "1","
 "
-"0","#summary(fwFit)"
