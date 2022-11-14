@@ -29,22 +29,25 @@ library(randomForest)
 
 # Data
 
-Use a relative path to import the data and subset the data to work on
-the data channel of interest.
+Read in the data and subset the data to work on the data channel of
+interest. We found that there are seven similar columns for weekday from
+Monday to Sunday, so we merged these columns and named the new variable
+as `publush_weekday`. For this step, we also removed the non-predictive
+variables.
 
 ``` r
 #Read in the data file
 newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
 #Choose the data channel of interest
-if (params$channel != "") {
-  paramChannelName <- params$channel
+if (params$channelName != "") {
+  paramChannel <- params$channelName
 } else {
-  paramChannelName <- "lifestyle"
+  paramChannel <- "lifestyle"
 }
-channel <- paste("data_channel_is_", paramChannelName, sep = "")
-#Merge the weekdays columns channels as one single column.
+channelName <- paste("data_channel_is_", paramChannel, sep = "")
+#Merge the weekdays columns as one single column.
 news <- newsData %>% 
-  filter(.data[[channel]] == 1) %>% 
+  filter(.data[[channelName]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -84,29 +87,8 @@ set.seed(111)
 trainIndex <- createDataPartition(news$shares, p = 0.7, list = FALSE)
 newsTrain <- news[trainIndex,]
 newsTest <- news[-trainIndex,]
-newsTrain
+#newsTrain
 ```
-
-    ## # A tibble: 1,472 × 47
-    ##    publish_wee…¹ n_tok…² n_tok…³ n_uni…⁴ n_non…⁵ n_non…⁶ num_h…⁷ num_s…⁸ num_i…⁹
-    ##    <fct>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-    ##  1 monday             10     187   0.667    1.00   0.800       7       0       1
-    ##  2 monday             11     103   0.689    1.00   0.806       3       1       1
-    ##  3 monday             11     315   0.551    1.00   0.702       4       4       1
-    ##  4 monday              6     374   0.641    1.00   0.828       7       0       1
-    ##  5 tuesday            12     499   0.513    1.00   0.662      14       1       1
-    ##  6 wednesday          11     223   0.662    1.00   0.826       5       3       0
-    ##  7 wednesday           7    1007   0.438    1.00   0.565      24      23      20
-    ##  8 wednesday           9     455   0.496    1.00   0.659      10       5       1
-    ##  9 wednesday          14     318   0.633    1.00   0.838       7       0       1
-    ## 10 wednesday           7     144   0.723    1.00   0.857       9       6       1
-    ## # … with 1,462 more rows, 38 more variables: num_videos <dbl>,
-    ## #   average_token_length <dbl>, num_keywords <dbl>, kw_min_min <dbl>,
-    ## #   kw_max_min <dbl>, kw_avg_min <dbl>, kw_min_max <dbl>, kw_max_max <dbl>,
-    ## #   kw_avg_max <dbl>, kw_min_avg <dbl>, kw_max_avg <dbl>, kw_avg_avg <dbl>,
-    ## #   self_reference_min_shares <dbl>, self_reference_max_shares <dbl>,
-    ## #   self_reference_avg_sharess <dbl>, is_weekend <dbl>, LDA_00 <dbl>,
-    ## #   LDA_01 <dbl>, LDA_02 <dbl>, LDA_03 <dbl>, LDA_04 <dbl>, …
 
 # Summarizations
 
@@ -114,8 +96,9 @@ Some basic summary statistics and plots about the training data.
 
 ## Tables
 
+Firstly, we summarized the training data.
+
 ``` r
-#summary for training data
 summary(newsTrain)
 ```
 
@@ -232,15 +215,12 @@ summary(newsTrain)
     ##  Max.   :1.0000               Max.   :208300  
     ## 
 
-``` r
-#numerical summary for our Y variable shares
-summary(newsTrain$shares)
-```
-
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##      28    1100    1700    3847    3225  208300
+Then let’s check our response variable `shares`. It shows that the mean
+of `shares` is 3847, standard deviation is 10112, median is 1700, IQR is
+2125.
 
 ``` r
+#numerical summary for the variable shares
 newsTrain %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
@@ -338,10 +318,11 @@ newsTrain %>%
     ## 7            9  3857  5590   1900  2900
     ## 8           10  4026 12375   1600  2100
 
-Contingency tables : Here, the title subjectivity is divided into 3
-categories : high, medium and low based on the values. If the value is
-greater than 0.8, it is high, greater than 0.4 and less than 0.8 is
-medium and remaining is low. The contingency table is then shown below.
+Contingency tables :  
+Here, the title subjectivity is divided into 3 categories : high, medium
+and low based on the values. If the value is greater than 0.8, it is
+high, greater than 0.4 and less than 0.8 is medium and remaining is low.
+The contingency table is then shown below.
 
 ``` r
 newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "High", 
@@ -353,6 +334,10 @@ table(newsTrain$subject_activity_type)
     ## 
     ##   High    Low Medium 
     ##    161    930    381
+
+The contingency table below shows the counts for each published weekday.
+From this table, we can find that the highest count is Wednesday, the
+lowest count is Saturday.
 
 ``` r
 table(newsTrain$publish_weekday)
@@ -723,18 +708,13 @@ boostedFit
 All the models are compared by RMSE on the test set
 
 ``` r
-#pred_Fit2 <- predict(lrFit_2, newdata = Test)
-fit2_mod <- postResample(predict(lrFit_2, newdata = Test), obs = Test$shares)
-#pred_Fit3 <- predict(lrFit_3, newdata = Test)
-fit3_mod <- postResample(predict(lrFit_3, newdata = Test), obs = Test$shares)
 #fit a linear regression model
-#pred_lrFit <- predict(lrFit, newdata = Test)
+fit2_mod <- postResample(predict(lrFit_2, newdata = Test), obs = Test$shares)
+fit3_mod <- postResample(predict(lrFit_3, newdata = Test), obs = Test$shares)
 lr_mod <- postResample(predict(lrFit, newdata = Test), obs = Test$shares)
 #random forest
-#pred_randomFit <- predict(randomFit, newdata = Test)
 random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares)
 #boosted tree
-#pred_boostedFit <- predict(boostedFit, newdata = Test)
 boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
 #compare all models
 tibble(model = c("LR with 2 predictors",
@@ -757,3 +737,27 @@ tibble(model = c("LR with 2 predictors",
     ## 3 LR with all predictors 5106.
     ## 4 Random Forest          5566.
     ## 5 Boosted Tree           5317.
+
+# Automation
+
+``` automate
+#Add channel names
+channelNames <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
+#Create file names
+output_file<-paste0(channelNames,".md")
+#create a list for each channel name
+params = lapply(channelNames, FUN = function(x){list(channelNames = x)})
+#put into a data frame
+reports <- tibble(output_file, params)
+#Render Code
+apply(reports, MARGIN = 1,FUN = function(x)
+  {
+    rmarkdown::render(input="project3.Rmd",
+    output_format = "github_document",
+    output_file = x[[1]],
+    params = x[[2]],
+    output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE)
+    )
+  }
+)
+```

@@ -10,6 +10,7 @@ Shaoyu Wang, Aniket Walimbe
 -   <a href="#summarizations" id="toc-summarizations">Summarizations</a>
 -   <a href="#model" id="toc-model">Model</a>
 -   <a href="#comparison" id="toc-comparison">Comparison</a>
+-   <a href="#automation" id="toc-automation">Automation</a>
 
 # Introduction
 
@@ -37,8 +38,11 @@ library(randomForest)
 
 # Data
 
-Use a relative path to import the data and subset the data to work on
-the data channel of interest.
+Read in the data and subset the data to work on the data channel of
+interest. We found that there are seven similar columns for weekday from
+Monday to Sunday, so we merged these columns and named the new variable
+as `publush_weekday`. For this step, we also removed the non-predictive
+variables.
 
 ``` r
 #Read in the data file
@@ -50,7 +54,7 @@ if (params$channel != "") {
   paramChannelName <- "lifestyle"
 }
 channel <- paste("data_channel_is_", paramChannelName, sep = "")
-#Merge the weekdays columns channels as one single column.
+#Merge the weekdays columns as one single column.
 news <- newsData %>% 
   filter(.data[[channel]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
@@ -71,7 +75,7 @@ set.seed(111)
 trainIndex <- createDataPartition(news$shares, p = 0.7, list = FALSE)
 newsTrain <- news[trainIndex,]
 newsTest <- news[-trainIndex,]
-newsTrain
+#newsTrain
 ```
 
 # Summarizations
@@ -80,8 +84,9 @@ Some basic summary statistics and plots about the training data.
 
 ## Tables
 
+Firstly, we summarized the training data.
+
 ``` r
-#summary for training data
 summary(newsTrain)
 ```
 
@@ -158,15 +163,12 @@ summary(newsTrain)
     ##  Max.   :0.5000         Max.   :1.0000               Max.   :208300  
     ## 
 
-``` r
-#numerical summary for our Y variable shares
-summary(newsTrain$shares)
-```
-
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##      28    1100    1700    3847    3225  208300
+Then let’s check our response variable `shares`. It shows that the mean
+of `shares` is 3847, standard deviation is 10112, median is 1700, IQR is
+2125.
 
 ``` r
+#numerical summary for the variable shares
 newsTrain %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
@@ -192,10 +194,11 @@ newsTrain %>%
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
-Contingency tables : Here, the title subjectivity is divided into 3
-categories : high, medium and low based on the values. If the value is
-greater than 0.8, it is high, greater than 0.4 and less than 0.8 is
-medium and remaining is low. The contingency table is then shown below.
+Contingency tables :  
+Here, the title subjectivity is divided into 3 categories : high, medium
+and low based on the values. If the value is greater than 0.8, it is
+high, greater than 0.4 and less than 0.8 is medium and remaining is low.
+The contingency table is then shown below.
 
 ``` r
 newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "High", 
@@ -207,6 +210,10 @@ table(newsTrain$subject_activity_type)
     ## 
     ##   High    Low Medium 
     ##    161    930    381
+
+The contingency table below shows the counts for each published weekday.
+From this table, we can find that the highest count is Wednesday, the
+lowest count is Saturday.
 
 ``` r
 table(newsTrain$publish_weekday)
@@ -224,7 +231,7 @@ g + geom_histogram(fill = "lightblue", binwidth = 1) +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-108-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = n_tokens_content))
@@ -232,7 +239,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-109-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = global_subjectivity))
@@ -240,7 +247,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-110-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
@@ -248,7 +255,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
@@ -256,7 +263,7 @@ g + geom_point() +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-112-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
@@ -264,7 +271,7 @@ g + geom_point() +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-113-1.png)<!-- -->
 
 Plot between title subjectivity and number of shares: We can inspect the
 trend of the shares as a function of title subjectivity.
@@ -275,7 +282,7 @@ g + geom_point() +
   labs(x = "Title subjectivity" , y = "Number of shares", title = "Scatter Plot : Title Subjectivity Vs Number of Shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-114-1.png)<!-- -->
 
 Plot between number of shares and article published day: This plot shows
 the number of shares an article has based on the day it has been
@@ -292,7 +299,7 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-115-1.png)<!-- -->
 
 Plot between number of images and number of shares:
 
@@ -302,7 +309,7 @@ g + geom_point() +
   labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-116-1.png)<!-- -->
 
 Plotting the correlation between numeric variables.
 
@@ -312,7 +319,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-117-1.png)<!-- -->
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
 num_self_hrefs, num_videos, average_token_length, num_keywords,
@@ -394,54 +401,6 @@ bwFit
 ``` r
 #summary(bwFit)
 ```
-
-``` r
-#fit a linear regression model with 2 predictors: num_videos, kw_avg_avg
-set.seed(111)
-lrFit_2 <- train(shares ~ num_videos + kw_avg_avg, data = Train,
-               method = "lm",
-               trControl = trainControl(method = "cv", number = 5))
-lrFit_2
-```
-
-    ## Linear Regression 
-    ## 
-    ## 1472 samples
-    ##    2 predictor
-    ## 
-    ## No pre-processing
-    ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1176, 1178, 1178, 1178, 1178 
-    ## Resampling results:
-    ## 
-    ##   RMSE      Rsquared   MAE     
-    ##   8855.734  0.0192847  3515.802
-    ## 
-    ## Tuning parameter 'intercept' was held constant at a value of TRUE
-
-``` r
-#fit a linear regression model with 3 predictors: n_tokens_content, num_videos, kw_avg_avg
-set.seed(111)
-lrFit_3 <- train(shares ~ n_tokens_content + num_videos + kw_avg_avg, data = Train,
-               method = "lm",
-               trControl = trainControl(method = "cv", number = 5))
-lrFit_3
-```
-
-    ## Linear Regression 
-    ## 
-    ## 1472 samples
-    ##    3 predictor
-    ## 
-    ## No pre-processing
-    ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1176, 1178, 1178, 1178, 1178 
-    ## Resampling results:
-    ## 
-    ##   RMSE      Rsquared    MAE    
-    ##   8878.246  0.01441459  3537.39
-    ## 
-    ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
 ``` r
 #fit a linear regression model with all predictors
@@ -555,28 +514,45 @@ boostedFit
 All the models are compared by RMSE on the test set
 
 ``` r
-#pred_Fit2 <- predict(lrFit_2, newdata = Test)
-fit2_mod <- postResample(predict(lrFit_2, newdata = Test), obs = Test$shares)
-#pred_Fit3 <- predict(lrFit_3, newdata = Test)
-fit3_mod <- postResample(predict(lrFit_3, newdata = Test), obs = Test$shares)
 #fit a linear regression model
-#pred_lrFit <- predict(lrFit, newdata = Test)
+fw_mod <- postResample(predict(fwFit, newdata = Test), obs = Test$shares)
+bw_mod <- postResample(predict(bwFit, newdata = Test), obs = Test$shares)
 lr_mod <- postResample(predict(lrFit, newdata = Test), obs = Test$shares)
 #random forest
-#pred_randomFit <- predict(randomFit, newdata = Test)
 random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares)
 #boosted tree
-#pred_boostedFit <- predict(boostedFit, newdata = Test)
 boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
 #compare all models
-print(tibble(model = c("LR with 2 predictors",
-                       "LR with 3 predictors",
-                      "LR with all predictors",
-                      "Random Forest",
-                      "Boosted Tree"), 
-             RMSE = c(fit2_mod[1],
-                      fit3_mod[1],
-                      lr_mod[1],
-                      random_mod[1],
-                      boosted_mod[1])))
+tibble(model = c("Forward",
+                 "Backward",
+                 "LR with all predictors",
+                 "Random Forest",
+                 "Boosted Tree"), 
+       RMSE = c(fw_mod[1],
+                bw_mod[1],
+                lr_mod[1],
+                random_mod[1],
+                boosted_mod[1]))
+```
+
+# Automation
+
+``` automate
+#create channel names
+channelIDs <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
+#create filenames
+output_file <- paste0(channelIDs,".md")
+#create a list for each channel with the channel name parameter
+params = lapply(channelIDs, FUN = function(x){list(channel = x)})
+#put into a data frame
+reports <- tibble(output_file, params)
+#render code
+apply(reports, MARGIN = 1,
+          FUN = function(x){
+             rmarkdown::render(input = "project3.Rmd",
+             output_format = "github_document",
+             output_file = x[[1]],
+             params = x[[2]],
+             output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
+             })
 ```
