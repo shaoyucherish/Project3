@@ -3,14 +3,14 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-14
 
--   <a href="#introduction" id="toc-introduction">Introduction</a>
--   <a href="#required-packages" id="toc-required-packages">Required
-    Packages</a>
--   <a href="#data" id="toc-data">Data</a>
--   <a href="#summarizations" id="toc-summarizations">Summarizations</a>
--   <a href="#model" id="toc-model">Model</a>
--   <a href="#comparison" id="toc-comparison">Comparison</a>
--   <a href="#automation" id="toc-automation">Automation</a>
+- <a href="#introduction" id="toc-introduction">Introduction</a>
+- <a href="#required-packages" id="toc-required-packages">Required
+  Packages</a>
+- <a href="#data" id="toc-data">Data</a>
+- <a href="#summarizations" id="toc-summarizations">Summarizations</a>
+- <a href="#model" id="toc-model">Model</a>
+- <a href="#comparison" id="toc-comparison">Comparison</a>
+- <a href="#automation" id="toc-automation">Automation</a>
 
 # Introduction
 
@@ -46,17 +46,17 @@ variables.
 
 ``` r
 #Read in the data file
-newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
+newsData <- read_csv("OnlineNewsPopularity.csv", show_col_types = FALSE)
 #Choose the data channel of interest
-if (params$channel != "") {
-  paramChannelName <- params$channel
+if (params$channelID != "") {
+  paramChannelName <- params$channelID
 } else {
   paramChannelName <- "lifestyle"
 }
-channel <- paste("data_channel_is_", paramChannelName, sep = "")
+channelID <- paste("data_channel_is_", paramChannelName, sep = "")
 #Merge the weekday columns as one single column.
 news <- newsData %>% 
-  filter(.data[[channel]] == 1) %>% 
+  filter(.data[[channelID]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -83,7 +83,7 @@ newsTest <- news[-trainIndex,]
 For this part, we created some basic summary statistics and plots about
 the training data.
 
--   Tables
+- Tables
 
 Firstly, let’s look at some tables. We summarized the training data, so
 that we can know all of the variables roughly. For example, this table
@@ -213,18 +213,17 @@ table(newsTrain$subject_activity_type)
     ##   High    Low Medium 
     ##    161    930    381
 
--   Plots
+- Plots
 
 Plotting the correlation between numeric variables.
 
 ``` r
 newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))
 correlation <- cor(newsTrainsub, method = "spearman")
-corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 0.5, mar = c(2, 0, 1, 0)) 
-corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
+corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> From the
+![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- --> From the
 correlation graph above, we can see that some variables are strongly
 correlated.
 
@@ -246,7 +245,7 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 Here, we have plotted the histogram for number of words in a title for
 the data. It can be seen that the graph shows the variable following
@@ -259,7 +258,7 @@ g + geom_histogram(fill = "lightblue", binwidth = 1) +
        title = "Histogram: Number of words in the title")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
 
 Then we have plotted the histogram for number of words in content for
 the data.
@@ -271,7 +270,7 @@ g + geom_histogram(fill = "lightblue") +
        title = "Histogram: Number of words in the content")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
 A histogram for text subjectivity.
 
@@ -282,7 +281,7 @@ g + geom_histogram(fill = "lightblue") +
        title = "Histogram: Text subjectivity")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
 
 A histogram for text sentiment polarity.
 
@@ -293,7 +292,7 @@ g + geom_histogram(fill = "lightblue") +
        title = "Histogram: Text sentiment polarity")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
 
 A plot between number of images and number of shares.
 
@@ -304,7 +303,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of images VS Number of shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
 
 A plot between average length of words in content and number of shares:
 We can inspect the trend of the shares as a function of average length
@@ -317,7 +316,7 @@ g + geom_point() +
        title = "Scatter Plot: Average token length VS Number of shares")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
 
 A plot between title subjectivity and number of shares: We can inspect
 the trend of the shares as a function of title subjectivity.
@@ -329,7 +328,7 @@ g + geom_point() +
        title = "Scatter Plot: Title subjectivity VS Number of shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
 num_self_hrefs, num_imgs, average_token_length, num_keywords,
@@ -348,7 +347,7 @@ Test <- newsTest %>%
 
 # Model
 
--   Linear Regression Model
+- Linear Regression Model
 
 Here, we have fitted a forward stepwise linear regression model for the
 training dataset having 15 variables. The data is centered and scaled
@@ -360,6 +359,7 @@ set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
                method = "leapForward",
                preProcess = c("center", "scale"))
+#summary(fwFit)
 fwFit
 ```
 
@@ -381,10 +381,6 @@ fwFit
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 3.
 
-``` r
-#summary(fwFit)
-```
-
 Here, we have fitted a backward stepwise linear regression model for the
 training dataset having 15 variables. The data is centered and scaled
 and number of shares is the response variable.
@@ -395,6 +391,7 @@ set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
                method = "leapBackward",
                preProcess = c("center", "scale"))
+#summary(bwFit)
 bwFit
 ```
 
@@ -415,10 +412,6 @@ bwFit
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 2.
-
-``` r
-#summary(bwFit)
-```
 
 ``` r
 #fit a linear regression model with all predictors
@@ -444,7 +437,7 @@ lrFit
     ## 
     ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
--   Random Forest Model
+- Random Forest Model
 
 Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.
@@ -477,7 +470,7 @@ randomFit
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
--   Boosted Tree Model
+- Boosted Tree Model
 
 Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.
@@ -567,11 +560,11 @@ tibble(model = c("Forward",
 
 ``` r
 #create channel names
-channelIDs <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
+channelID <- data.frame("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
 #create filenames
-output_file <- paste0(channelIDs,".md")
+output_file <- paste0(channelID,".md")
 #create a list for each channel with the channel name parameter
-params = lapply(channelIDs, FUN = function(x){list(channel = x)})
+params = lapply(channelID, FUN = function(x){list(channelID = x)})
 #put into a data frame
 reports <- tibble(output_file, params)
 #render code
