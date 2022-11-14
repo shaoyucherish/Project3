@@ -1,8 +1,0 @@
-"0","newsTrainday <- newsTrain %>%"
-"0","  select(publish_weekday, shares) %>%"
-"0","  group_by(publish_weekday) %>% "
-"0","  summarise(total_shares=sum(shares))"
-"0",""
-"0","g <- ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))"
-"0","g + geom_col(fill = ""lightblue"")+"
-"0","  labs(title = "" Shares for articles published based on weekdays"")"

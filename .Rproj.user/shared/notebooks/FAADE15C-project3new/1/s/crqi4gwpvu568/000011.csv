@@ -1,4 +1,0 @@
-"0","g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))"
-"0","g + geom_point() + "
-"0","  labs(x = ""Average token length"" , y = ""Number of shares"", "
-"0","       title = ""Scatter Plot: Average token length VS Number of shares"")"

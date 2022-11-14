@@ -1,4 +1,0 @@
-"0","g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))"
-"0","g + geom_point() + "
-"0","  labs(x = ""Title subjectivity"" , y = ""Number of shares"", "
-"0","       title = ""Scatter Plot: Title subjectivity VS Number of shares"") "

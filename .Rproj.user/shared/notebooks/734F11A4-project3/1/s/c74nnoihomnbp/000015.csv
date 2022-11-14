@@ -1,4 +1,0 @@
-"0","g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))"
-"0","g + geom_histogram(fill = ""lightblue"") + "
-"0","  labs(x = ""Text sentiment polarity"", "
-"0","       title = ""Histogram: Text sentiment polarity"")"

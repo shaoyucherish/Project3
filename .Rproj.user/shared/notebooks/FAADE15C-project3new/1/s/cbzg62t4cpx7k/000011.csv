@@ -1,4 +1,0 @@
-"0","g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))"
-"0","g + geom_point() +"
-"0","  labs(x = ""Number of images"" , y = ""Number of shares"", "
-"0","       title = ""Scatter Plot: Number of images VS Number of shares"") "
