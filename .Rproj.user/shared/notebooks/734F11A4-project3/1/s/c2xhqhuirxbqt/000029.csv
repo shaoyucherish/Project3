@@ -1,0 +1,4 @@
+"0","newsTrain %>% "
+"0","  group_by(num_imgs) %>% "
+"0","  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), "
+"0","            median = round(median(shares), 0), IQR = round(IQR(shares), 0))"
