@@ -20,7 +20,7 @@ rmarkdown::render("project3.Rmd",
 
 # Introduction
 
-This [online News Popularity Data Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years.
+This [online News Popularity Data Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years. The target variable is the number of shares for that specific article for which we are using publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity variables. These variables were decided after plotting the correlation between all numeric variables. The porpose of the analysis is to fit  linear regression, random forest and boosted tree models for prediction of the number of shares and comparing all the models to find the best performing one.
 
 # Required Packages
 
@@ -129,11 +129,14 @@ table(newsTrain$publish_weekday)
 
 ## Plots
 
+Here , we have plotted the histogram for number of words in a title for the data. It can be seen that the graph shows the variable following normal distribution 
 ```{r}
 g <- ggplot(newsTrain, aes(x = n_tokens_title))
 g + geom_histogram(fill = "lightblue", binwidth = 1) + 
   labs()
 ```
+
+Here , we have plotted the histogram for number of words in content for the data.
 
 ```{r}
 g <- ggplot(newsTrain, aes(x = n_tokens_content))
@@ -153,12 +156,16 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
+Plot between rate of positive words among non-neutral tokens  and number of shares: We can inspect the trend of the shares as a function of Rate of positive words among non-neutral tokens .  
+
 ```{r}
 g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
 g + geom_point() + 
   labs()
 ```
 
+
+Plot between average length of words in content and number of shares: We can inspect the trend of the shares as a function of average length of words in content.  
 ```{r}
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
 g + geom_point() + 
@@ -185,7 +192,8 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-Plot between number of images and number of shares: 
+Plot between number of images and number of shares: We can inspect the trend of the shares as a function of number of images. 
+
 ```{r}
 g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
 g + geom_point() +
@@ -214,6 +222,8 @@ Train
 
 ## Linear Regression Model
 
+Here, we have fitted a forward stepwise linear regression model for the training dataset having 15 variables.  The data is centred and scaled and number of shares is the response variable.
+
 ```{r}
 #forward stepwise
 set.seed(111)
@@ -223,6 +233,7 @@ fwFit <- train(shares ~ ., data = Train,
 fwFit
 #summary(fwFit)
 ```
+Here, we have fitted a backward stepwise linear regression model for the training dataset having 15 variables.  The data is centred and scaled and number of shares is the response variable.
 
 ```{r}
 #backward stepwise
@@ -234,6 +245,7 @@ bwFit
 #summary(bwFit)
 ```
 
+Here, we have fitted a forward stepwise linear regression model for the training dataset having 15 variables.  
 ```{r}
 #fit a linear regression model with all predictors
 set.seed(111)
@@ -244,6 +256,10 @@ lrFit
 ```
 
 ## Random Forest Model
+
+Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. The tuning parameter is given as number of columns in the training data divided by 3.
+
+
 ```{r}
 set.seed(111)
 randomFit <- train(shares ~ ., 
@@ -256,6 +272,10 @@ randomFit
 ```
 
 ## Boosted Tree Model
+
+Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. Tuning parameters are n.trees, interaction.depth, shrinkage and n.minobsinnode.
+
+
 ```{r}
 set.seed(111)
 boostedFit <- train(shares ~ ., 
@@ -273,7 +293,7 @@ boostedFit
 
 # Comparison
 
-All the models are compared by RMSE on the test set
+All the models are compared by RMSE on the test set. 
 
 ```{r}
 #fit a linear regression model
