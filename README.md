@@ -21,7 +21,7 @@ Mashable in a period of two years.
 
 # Required Packages
 
-First, we will load the required packages:
+First, we need to load the required packages:
 
 ``` r
 # Load libraries
@@ -83,7 +83,7 @@ newsTest <- news[-trainIndex,]
 For this part, we created some basic summary statistics and plots about
 the training data.
 
-## Tables
+-   Tables
 
 Firstly, let’s look at some tables. We summarized the training data, so
 that we can know all of the variables roughly. For example, this table
@@ -213,7 +213,7 @@ table(newsTrain$subject_activity_type)
     ##   High    Low Medium 
     ##    161    930    381
 
-## Plots
+-   Plots
 
 Plotting the correlation between numeric variables.
 
@@ -224,7 +224,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-103-1.png)<!-- --> From the
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> From the
 correlation graph above, we can see that some variables are strongly
 correlated.
 
@@ -246,7 +246,7 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-104-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 Here, we have plotted the histogram for number of words in a title for
 the data. It can be seen that the graph shows the variable following
@@ -259,7 +259,7 @@ g + geom_histogram(fill = "lightblue", binwidth = 1) +
        title = "Histogram: Number of words in the title")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-105-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 Then we have plotted the histogram for number of words in content for
 the data.
@@ -271,7 +271,7 @@ g + geom_histogram(fill = "lightblue") +
        title = "Histogram: Number of words in the content")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-106-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 A histogram for text subjectivity.
 
@@ -282,7 +282,7 @@ g + geom_histogram(fill = "lightblue") +
        title = "Histogram: Text subjectivity")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-107-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 A histogram for text sentiment polarity.
 
@@ -293,7 +293,7 @@ g + geom_histogram(fill = "lightblue") +
        title = "Histogram: Text sentiment polarity")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-108-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 A plot between number of images and number of shares.
 
@@ -304,7 +304,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of images VS Number of shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-109-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 A plot between average length of words in content and number of shares:
 We can inspect the trend of the shares as a function of average length
@@ -317,7 +317,7 @@ g + geom_point() +
        title = "Scatter Plot: Average token length VS Number of shares")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-110-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 A plot between title subjectivity and number of shares: We can inspect
 the trend of the shares as a function of title subjectivity.
@@ -329,7 +329,7 @@ g + geom_point() +
        title = "Scatter Plot: Title subjectivity VS Number of shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
 num_self_hrefs, num_imgs, average_token_length, num_keywords,
@@ -348,7 +348,7 @@ Test <- newsTest %>%
 
 # Model
 
-## Linear Regression Model
+-   Linear Regression Model
 
 Here, we have fitted a forward stepwise linear regression model for the
 training dataset having 15 variables. The data is centered and scaled
@@ -444,7 +444,7 @@ lrFit
     ## 
     ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
-## Random Forest Model
+-   Random Forest Model
 
 Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.
@@ -477,7 +477,7 @@ randomFit
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
-## Boosted Tree Model
+-   Boosted Tree Model
 
 Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.

@@ -618,7 +618,7 @@ Packages</a></li>
 news popularity data set</a> summarizes a heterogeneous set of features
 about articles published by Mashable in a period of two years.</p>
 <h1 id="required-packages">Required Packages</h1>
-<p>First, we will load the required packages:</p>
+<p>First, we need to load the required packages:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load libraries</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -665,7 +665,9 @@ non-predictive variables.</p>
 <h1 id="summarizations">Summarizations</h1>
 <p>For this part, we created some basic summary statistics and plots
 about the training data.</p>
-<h2 id="tables">Tables</h2>
+<ul>
+<li>Tables</li>
+</ul>
 <p>Firstly, let’s look at some tables. We summarized the training data,
 so that we can know all of the variables roughly. For example, this
 table shows each count for published on weekdays, we can see which has
@@ -780,7 +782,9 @@ The contingency table is then shown below.</li>
 <pre><code>## 
 ##   High    Low Medium 
 ##    161    930    381</code></pre>
-<h2 id="plots">Plots</h2>
+<ul>
+<li>Plots</li>
+</ul>
 <p>Plotting the correlation between numeric variables.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>newsTrainsub <span class="ot">&lt;-</span> newsTrain <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(publish_weekday, subject_activity_type))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>correlation <span class="ot">&lt;-</span> <span class="fu">cor</span>(newsTrainsub, <span class="at">method =</span> <span class="st">&quot;spearman&quot;</span>)</span>
@@ -863,7 +867,9 @@ title_subjectivity, shares.</p>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)</span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Train</span></span></code></pre></div>
 <h1 id="model">Model</h1>
-<h2 id="linear-regression-model">Linear Regression Model</h2>
+<ul>
+<li>Linear Regression Model</li>
+</ul>
 <p>Here, we have fitted a forward stepwise linear regression model for
 the training dataset having 15 variables. The data is centered and
 scaled and number of shares is the response variable.</p>
@@ -938,7 +944,9 @@ scaled and number of shares is the response variable.</p>
 ##   8970.843  0.007650198  3659.286
 ## 
 ## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
-<h2 id="random-forest-model">Random Forest Model</h2>
+<ul>
+<li>Random Forest Model</li>
+</ul>
 <p>Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.
 The tuning parameter is given as number of columns in the training data
@@ -965,7 +973,9 @@ divided by 3.</p>
 ##   9079.444  0.0153692  3845.417
 ## 
 ## Tuning parameter &#39;mtry&#39; was held constant at a value of 5.333333</code></pre>
-<h2 id="boosted-tree-model">Boosted Tree Model</h2>
+<ul>
+<li>Boosted Tree Model</li>
+</ul>
 <p>Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.
 Tuning parameters are n.trees, interaction.depth, shrinkage and
