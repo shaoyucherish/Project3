@@ -231,7 +231,7 @@ g + geom_histogram(fill = "lightblue", binwidth = 1) +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-108-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = n_tokens_content))
@@ -239,7 +239,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-109-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = global_subjectivity))
@@ -247,7 +247,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-110-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
@@ -255,7 +255,7 @@ g + geom_histogram(fill = "lightblue") +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
@@ -263,7 +263,7 @@ g + geom_point() +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-112-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
@@ -271,7 +271,7 @@ g + geom_point() +
   labs()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-113-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Plot between title subjectivity and number of shares: We can inspect the
 trend of the shares as a function of title subjectivity.
@@ -282,7 +282,7 @@ g + geom_point() +
   labs(x = "Title subjectivity" , y = "Number of shares", title = "Scatter Plot : Title Subjectivity Vs Number of Shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-114-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Plot between number of shares and article published day: This plot shows
 the number of shares an article has based on the day it has been
@@ -299,7 +299,7 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-115-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Plot between number of images and number of shares:
 
@@ -309,7 +309,7 @@ g + geom_point() +
   labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-116-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 Plotting the correlation between numeric variables.
 
@@ -319,7 +319,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 
 corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-117-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
 num_self_hrefs, num_videos, average_token_length, num_keywords,
@@ -344,8 +344,8 @@ Train
 #forward stepwise
 set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
-                   method = "leapForward",
-                   preProcess = c("center", "scale"))
+               method = "leapForward",
+               preProcess = c("center", "scale"))
 fwFit
 ```
 
@@ -375,8 +375,8 @@ fwFit
 #backward stepwise
 set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
-                   method = "leapBackward",
-                   preProcess = c("center", "scale"))
+               method = "leapBackward",
+               preProcess = c("center", "scale"))
 bwFit
 ```
 

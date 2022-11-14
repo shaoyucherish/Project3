@@ -218,8 +218,8 @@ Train
 #forward stepwise
 set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
-                   method = "leapForward",
-                   preProcess = c("center", "scale"))
+               method = "leapForward",
+               preProcess = c("center", "scale"))
 fwFit
 #summary(fwFit)
 ```
@@ -228,8 +228,8 @@ fwFit
 #backward stepwise
 set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
-                   method = "leapBackward",
-                   preProcess = c("center", "scale"))
+               method = "leapBackward",
+               preProcess = c("center", "scale"))
 bwFit
 #summary(bwFit)
 ```

@@ -39,15 +39,15 @@ variables.
 #Read in the data file
 newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
 #Choose the data channel of interest
-if (params$channelName != "") {
-  paramChannel <- params$channelName
+if (params$channel != "") {
+  paramChannelName <- params$channel
 } else {
-  paramChannel <- "lifestyle"
+  paramChannelName <- "lifestyle"
 }
-channelName <- paste("data_channel_is_", paramChannel, sep = "")
+channel <- paste("data_channel_is_", paramChannelName, sep = "")
 #Merge the weekdays columns as one single column.
 news <- newsData %>% 
-  filter(.data[[channelName]] == 1) %>% 
+  filter(.data[[channel]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -489,8 +489,8 @@ Train
 #forward stepwise
 set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
-                   method = "leapForward",
-                   preProcess = c("center", "scale"))
+               method = "leapForward",
+               preProcess = c("center", "scale"))
 fwFit
 ```
 
@@ -520,8 +520,8 @@ fwFit
 #backward stepwise
 set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
-                   method = "leapBackward",
-                   preProcess = c("center", "scale"))
+               method = "leapBackward",
+               preProcess = c("center", "scale"))
 bwFit
 ```
 
@@ -546,54 +546,6 @@ bwFit
 ``` r
 #summary(bwFit)
 ```
-
-``` r
-#fit a linear regression model with 2 predictors: num_videos, kw_avg_avg
-set.seed(111)
-lrFit_2 <- train(shares ~ num_videos + kw_avg_avg, data = Train,
-               method = "lm",
-               trControl = trainControl(method = "cv", number = 5))
-lrFit_2
-```
-
-    ## Linear Regression 
-    ## 
-    ## 1472 samples
-    ##    2 predictor
-    ## 
-    ## No pre-processing
-    ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1176, 1178, 1178, 1178, 1178 
-    ## Resampling results:
-    ## 
-    ##   RMSE      Rsquared   MAE     
-    ##   8855.734  0.0192847  3515.802
-    ## 
-    ## Tuning parameter 'intercept' was held constant at a value of TRUE
-
-``` r
-#fit a linear regression model with 3 predictors: n_tokens_content, num_videos, kw_avg_avg
-set.seed(111)
-lrFit_3 <- train(shares ~ n_tokens_content + num_videos + kw_avg_avg, data = Train,
-               method = "lm",
-               trControl = trainControl(method = "cv", number = 5))
-lrFit_3
-```
-
-    ## Linear Regression 
-    ## 
-    ## 1472 samples
-    ##    3 predictor
-    ## 
-    ## No pre-processing
-    ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1176, 1178, 1178, 1178, 1178 
-    ## Resampling results:
-    ## 
-    ##   RMSE      Rsquared    MAE    
-    ##   8878.246  0.01441459  3537.39
-    ## 
-    ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
 ``` r
 #fit a linear regression model with all predictors
@@ -709,21 +661,21 @@ All the models are compared by RMSE on the test set
 
 ``` r
 #fit a linear regression model
-fit2_mod <- postResample(predict(lrFit_2, newdata = Test), obs = Test$shares)
-fit3_mod <- postResample(predict(lrFit_3, newdata = Test), obs = Test$shares)
+fw_mod <- postResample(predict(fwFit, newdata = Test), obs = Test$shares)
+bw_mod <- postResample(predict(bwFit, newdata = Test), obs = Test$shares)
 lr_mod <- postResample(predict(lrFit, newdata = Test), obs = Test$shares)
 #random forest
 random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares)
 #boosted tree
 boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
 #compare all models
-tibble(model = c("LR with 2 predictors",
-                 "LR with 3 predictors",
+tibble(model = c("Forward",
+                 "Backward",
                  "LR with all predictors",
                  "Random Forest",
                  "Boosted Tree"), 
-       RMSE = c(fit2_mod[1],
-                fit3_mod[1],
+       RMSE = c(fw_mod[1],
+                bw_mod[1],
                 lr_mod[1],
                 random_mod[1],
                 boosted_mod[1]))
@@ -732,8 +684,8 @@ tibble(model = c("LR with 2 predictors",
     ## # A tibble: 5 × 2
     ##   model                   RMSE
     ##   <chr>                  <dbl>
-    ## 1 LR with 2 predictors   5020.
-    ## 2 LR with 3 predictors   5069.
+    ## 1 Forward                5069.
+    ## 2 Backward               5020.
     ## 3 LR with all predictors 5106.
     ## 4 Random Forest          5566.
     ## 5 Boosted Tree           5317.
@@ -741,23 +693,21 @@ tibble(model = c("LR with 2 predictors",
 # Automation
 
 ``` automate
-#Add channel names
-channelNames <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
-#Create file names
-output_file<-paste0(channelNames,".md")
-#create a list for each channel name
-params = lapply(channelNames, FUN = function(x){list(channelNames = x)})
+#create channel names
+channelIDs <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
+#create filenames
+output_file <- paste0(channelIDs,".md")
+#create a list for each channel with the channel name parameter
+params = lapply(channelIDs, FUN = function(x){list(channel = x)})
 #put into a data frame
 reports <- tibble(output_file, params)
-#Render Code
-apply(reports, MARGIN = 1,FUN = function(x)
-  {
-    rmarkdown::render(input="project3.Rmd",
-    output_format = "github_document",
-    output_file = x[[1]],
-    params = x[[2]],
-    output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE)
-    )
-  }
-)
+#render code
+apply(reports, MARGIN = 1,
+          FUN = function(x){
+             rmarkdown::render(input = "project3.Rmd",
+             output_format = "github_document",
+             output_file = x[[1]],
+             params = x[[2]],
+             output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
+             })
 ```
