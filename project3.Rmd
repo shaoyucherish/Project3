@@ -107,6 +107,12 @@ newsTrain %>%
   group_by(num_imgs) %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+
+newsTrain %>% 
+  group_by(num_videos) %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+
 newsTrain %>% 
   group_by(num_keywords) %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
@@ -225,7 +231,8 @@ Here, we have fitted a forward stepwise linear regression model for the training
 set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
                method = "leapForward",
-               preProcess = c("center", "scale"))
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", number = 5))
 #summary(fwFit)
 fwFit
 ```
@@ -236,7 +243,8 @@ Here, we have fitted a backward stepwise linear regression model for the trainin
 set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
                method = "leapBackward",
-               preProcess = c("center", "scale"))
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", number = 5))
 #summary(bwFit)
 bwFit
 ```
