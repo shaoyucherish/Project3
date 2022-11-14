@@ -1,0 +1,4 @@
+"0","g <- ggplot(newsTrain, aes(x = global_subjectivity))"
+"0","g + geom_histogram(fill = ""lightblue"") + "
+"0","  labs(x = ""Text subjectivity"", "
+"0","       title = ""Histogram: Text subjectivity"")"

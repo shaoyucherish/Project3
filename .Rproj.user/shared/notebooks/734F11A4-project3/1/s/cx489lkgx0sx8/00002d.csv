@@ -1,0 +1,3 @@
+"0","newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))"
+"0","correlation <- cor(newsTrainsub, method = ""spearman"")"
+"0","corrplot(correlation, tl.col = ""black"", tl.cex = 0.5)"

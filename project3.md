@@ -37,17 +37,17 @@ variables.
 
 ``` r
 #Read in the data file
-newsData <- read_csv("OnlineNewsPopularity.csv",show_col_types = FALSE)
+newsData <- read_csv("OnlineNewsPopularity.csv", show_col_types = FALSE)
 #Choose the data channel of interest
-if (params$channel != "") {
-  paramChannelName <- params$channel
+if (params$channelID != "") {
+  paramChannelName <- params$channelID
 } else {
   paramChannelName <- "lifestyle"
 }
-channel <- paste("data_channel_is_", paramChannelName, sep = "")
+channelID <- paste("data_channel_is_", paramChannelName, sep = "")
 #Merge the weekday columns as one single column.
 news <- newsData %>% 
-  filter(.data[[channel]] == 1) %>% 
+  filter(.data[[channelID]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -321,8 +321,7 @@ Plotting the correlation between numeric variables.
 ``` r
 newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))
 correlation <- cor(newsTrainsub, method = "spearman")
-corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 0.5, mar = c(2, 0, 1, 0)) 
-corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
+corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
 
 ![](project3_files/figure-gfm/unnamed-chunk-9-1.png)<!-- --> From the
@@ -672,11 +671,11 @@ tibble(model = c("Forward",
 
 ``` r
 #create channel names
-channelIDs <- data.frame("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
+channelID <- data.frame("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
 #create filenames
-output_file <- paste0(channelIDs,".md")
+output_file <- paste0(channelID,".md")
 #create a list for each channel with the channel name parameter
-params = lapply(channelIDs, FUN = function(x){list(channel = x)})
+params = lapply(channelID, FUN = function(x){list(channelID = x)})
 #put into a data frame
 reports <- tibble(output_file, params)
 #render code
