@@ -1,5 +1,0 @@
-"0","set.seed(111)"
-"0","trainIndex <- createDataPartition(news$shares, p = 0.7, list = FALSE)"
-"0","newsTrain <- news[trainIndex,]"
-"0","newsTest <- news[-trainIndex,]"
-"0","#newsTrain"
