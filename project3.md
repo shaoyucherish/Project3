@@ -444,29 +444,8 @@ Train <- newsTrain %>%
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
 Test <- newsTest %>% 
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
-Train
+#Train
 ```
-
-    ## # A tibble: 1,472 × 16
-    ##    publish_wee…¹ n_tok…² n_tok…³ num_s…⁴ num_i…⁵ avera…⁶ num_k…⁷ kw_av…⁸ self_…⁹
-    ##    <fct>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-    ##  1 monday             10     187       0       1    4.66       7      0       0 
-    ##  2 monday             11     103       1       1    4.84       6      0    5000 
-    ##  3 monday             11     315       4       1    4.38      10      0    6200 
-    ##  4 monday              6     374       0       1    4.91       8      0       0 
-    ##  5 tuesday            12     499       1       1    5.08      10    885.   1300 
-    ##  6 wednesday          11     223       3       0    4.55       6   1207.  11700 
-    ##  7 wednesday           7    1007      23      20    4.79      10   1488.   3096.
-    ##  8 wednesday           9     455       5       1    4.69       9   1367.   3500 
-    ##  9 wednesday          14     318       0       1    4.43       7    816.      0 
-    ## 10 wednesday           7     144       6       1    4.83      10   1269.   2760 
-    ## # … with 1,462 more rows, 7 more variables: LDA_04 <dbl>,
-    ## #   global_subjectivity <dbl>, global_sentiment_polarity <dbl>,
-    ## #   avg_positive_polarity <dbl>, avg_negative_polarity <dbl>,
-    ## #   title_subjectivity <dbl>, shares <dbl>, and abbreviated variable names
-    ## #   ¹​publish_weekday, ²​n_tokens_title, ³​n_tokens_content, ⁴​num_self_hrefs,
-    ## #   ⁵​num_imgs, ⁶​average_token_length, ⁷​num_keywords, ⁸​kw_avg_avg,
-    ## #   ⁹​self_reference_avg_sharess
 
 # Model
 

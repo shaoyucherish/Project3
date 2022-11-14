@@ -14,8 +14,8 @@ Shaoyu Wang, Aniket Walimbe
 
 # Introduction
 
-This [online News Popularity Data
-Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity)
+This [online news popularity data
+set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity)
 summarizes a heterogeneous set of features about articles published by
 Mashable in a period of two years.
 
@@ -41,7 +41,7 @@ library(randomForest)
 Read in the data and subset the data to work on the data channel of
 interest. We found that there are seven similar columns for weekday from
 Monday to Sunday, so we merged these columns and named the new variable
-as `publush_weekday`. For this step, we also removed the non-predictive
+as `publish_weekday`. For this step, we also removed the non-predictive
 variables.
 
 ``` r
@@ -54,7 +54,7 @@ if (params$channel != "") {
   paramChannelName <- "lifestyle"
 }
 channel <- paste("data_channel_is_", paramChannelName, sep = "")
-#Merge the weekdays columns as one single column.
+#Merge the weekday columns as one single column.
 news <- newsData %>% 
   filter(.data[[channel]] == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
@@ -80,11 +80,16 @@ newsTest <- news[-trainIndex,]
 
 # Summarizations
 
-Some basic summary statistics and plots about the training data.
+For this part, we created some basic summary statistics and plots about
+the training data.
 
 ## Tables
 
-Firstly, we summarized the training data.
+Firstly, let’s look at some tables. We summarized the training data, so
+that we can know all of the variables roughly. For example, this table
+shows each count for published on weekdays, we can see which has the
+most count and which has the least count. It also shows the minimum, 1st
+quantile, median, mean, 3rd quantile and maximum of other variables.
 
 ``` r
 summary(newsTrain)
@@ -163,9 +168,8 @@ summary(newsTrain)
     ##  Max.   :0.5000         Max.   :1.0000               Max.   :208300  
     ## 
 
-Then let’s check our response variable `shares`. It shows that the mean
-of `shares` is 3847, standard deviation is 10112, median is 1700, IQR is
-2125.
+Then we can check our response variable `shares`. It shows that the
+mean, standard deviation, median, IQR of `shares` as follows.
 
 ``` r
 #numerical summary for the variable shares
@@ -173,6 +177,8 @@ newsTrain %>%
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
+
+We also obtain the numerical summaries on some subgroups.
 
 ``` r
 #numerical summaries on subgroups
@@ -185,25 +191,21 @@ newsTrain %>%
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 newsTrain %>% 
-  group_by(num_videos) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
-            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
-newsTrain %>% 
   group_by(num_keywords) %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
-Contingency tables :  
-Here, the title subjectivity is divided into 3 categories : high, medium
-and low based on the values. If the value is greater than 0.8, it is
-high, greater than 0.4 and less than 0.8 is medium and remaining is low.
+Moreover, we divide the title subjectivity into 3 categories:  
+1. High: greater than 0.8  
+2. Medium: 0.4 to less than 0.8  
+3. Low: less than 0.4  
 The contingency table is then shown below.
 
 ``` r
 newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "High", 
                                           ifelse(newsTrain$title_subjectivity >= 0.4, "Medium",
-                                                 ifelse(airquality$Wind >= 0, "Low", "None")))
+                                                 ifelse(airquality$Wind >= 0, "Low")))
 table(newsTrain$subject_activity_type)
 ```
 
@@ -211,81 +213,26 @@ table(newsTrain$subject_activity_type)
     ##   High    Low Medium 
     ##    161    930    381
 
-The contingency table below shows the counts for each published weekday.
-From this table, we can find that the highest count is Wednesday, the
-lowest count is Saturday.
-
-``` r
-table(newsTrain$publish_weekday)
-```
-
-    ## 
-    ##    friday    monday  saturday    sunday  thursday   tuesday wednesday 
-    ##       208       221       133       135       254       240       281
-
 ## Plots
 
-``` r
-g <- ggplot(newsTrain, aes(x = n_tokens_title))
-g + geom_histogram(fill = "lightblue", binwidth = 1) + 
-  labs()
-```
-
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+Plotting the correlation between numeric variables.
 
 ``` r
-g <- ggplot(newsTrain, aes(x = n_tokens_content))
-g + geom_histogram(fill = "lightblue") + 
-  labs()
+newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))
+correlation <- cor(newsTrainsub, method = "spearman")
+corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 0.5, mar = c(2, 0, 1, 0)) 
+corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-103-1.png)<!-- --> From the
+correlation graph above, we can see that some variables are strongly
+correlated.
 
-``` r
-g <- ggplot(newsTrain, aes(x = global_subjectivity))
-g + geom_histogram(fill = "lightblue") + 
-  labs()
-```
+For further EDA, we are plotting several graphs to see trends between
+different variables with respect to the number of shares.
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-
-``` r
-g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
-g + geom_histogram(fill = "lightblue") + 
-  labs()
-```
-
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
-``` r
-g <- ggplot(newsTrain, aes(x = rate_positive_words, y = shares))
-g + geom_point() + 
-  labs()
-```
-
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
-
-``` r
-g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
-g + geom_point() + 
-  labs()
-```
-
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
-
-Plot between title subjectivity and number of shares: We can inspect the
-trend of the shares as a function of title subjectivity.
-
-``` r
-g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
-g + geom_point() + 
-  labs(x = "Title subjectivity" , y = "Number of shares", title = "Scatter Plot : Title Subjectivity Vs Number of Shares") 
-```
-
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
-
-Plot between number of shares and article published day: This plot shows
-the number of shares an article has based on the day it has been
+A plot between number of shares and article published day: This plot
+shows the number of shares an article has based on the day it has been
 published.
 
 ``` r
@@ -299,30 +246,93 @@ g + geom_col(fill = "lightblue")+
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-104-1.png)<!-- -->
 
-Plot between number of images and number of shares:
+Here, we have plotted the histogram for number of words in a title for
+the data. It can be seen that the graph shows the variable following
+normal distribution.
+
+``` r
+g <- ggplot(newsTrain, aes(x = n_tokens_title))
+g + geom_histogram(fill = "lightblue", binwidth = 1) + 
+  labs(x = "Number of words in the title",
+       title = "Histogram: Number of words in the title")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-105-1.png)<!-- -->
+
+Then we have plotted the histogram for number of words in content for
+the data.
+
+``` r
+g <- ggplot(newsTrain, aes(x = n_tokens_content))
+g + geom_histogram(fill = "lightblue") + 
+  labs(x = "Number of words in the content", 
+       title = "Histogram: Number of words in the content")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-106-1.png)<!-- -->
+
+A histogram for text subjectivity.
+
+``` r
+g <- ggplot(newsTrain, aes(x = global_subjectivity))
+g + geom_histogram(fill = "lightblue") + 
+  labs(x = "Text subjectivity", 
+       title = "Histogram: Text subjectivity")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-107-1.png)<!-- -->
+
+A histogram for text sentiment polarity.
+
+``` r
+g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
+g + geom_histogram(fill = "lightblue") + 
+  labs(x = "Text sentiment polarity", 
+       title = "Histogram: Text sentiment polarity")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-108-1.png)<!-- -->
+
+A plot between number of images and number of shares.
 
 ``` r
 g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
 g + geom_point() +
-  labs(x = "Number of Images" , y = "Number of shares", title = "Scatter Plot : Number of Images Vs Number of Shares") 
+  labs(x = "Number of images" , y = "Number of shares", 
+       title = "Scatter Plot: Number of images VS Number of shares") 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-109-1.png)<!-- -->
 
-Plotting the correlation between numeric variables.
+A plot between average length of words in content and number of shares:
+We can inspect the trend of the shares as a function of average length
+of words in content.
 
 ``` r
-correlation <- cor(newsTrain %>% select(-c(publish_weekday, subject_activity_type)), method = "spearman")
-corrplot(correlation, type = "upper", tl.pos = "lt", tl.col = "black", tl.cex = 0.5, mar = c(2, 0, 1, 0)) 
-corrplot(correlation, type = "lower", add = TRUE, diag = FALSE, tl.pos = "n", number.cex = 0.5)
+g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
+g + geom_point() + 
+  labs(x = "Average token length" , y = "Number of shares", 
+       title = "Scatter Plot: Average token length VS Number of shares")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-110-1.png)<!-- -->
+
+A plot between title subjectivity and number of shares: We can inspect
+the trend of the shares as a function of title subjectivity.
+
+``` r
+g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
+g + geom_point() + 
+  labs(x = "Title subjectivity" , y = "Number of shares", 
+       title = "Scatter Plot: Title subjectivity VS Number of shares") 
+```
+
+![](README_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
 
 Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
-num_self_hrefs, num_videos, average_token_length, num_keywords,
+num_self_hrefs, num_imgs, average_token_length, num_keywords,
 kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity,
 global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity,
 title_subjectivity, shares.
@@ -330,15 +340,19 @@ title_subjectivity, shares.
 ``` r
 set.seed(111)
 Train <- newsTrain %>% 
-  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
 Test <- newsTest %>% 
-  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
-Train
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+#Train
 ```
 
 # Model
 
 ## Linear Regression Model
+
+Here, we have fitted a forward stepwise linear regression model for the
+training dataset having 15 variables. The data is centered and scaled
+and number of shares is the response variable.
 
 ``` r
 #forward stepwise
@@ -360,9 +374,9 @@ fwFit
     ## Resampling results across tuning parameters:
     ## 
     ##   nvmax  RMSE      Rsquared     MAE     
-    ##   2      9801.072  0.004031191  3620.379
-    ##   3      9798.712  0.006010639  3625.675
-    ##   4      9818.258  0.005488719  3643.106
+    ##   2      9269.454  0.008389984  3542.761
+    ##   3      9265.297  0.009834649  3553.835
+    ##   4      9269.232  0.010382643  3572.915
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 3.
@@ -370,6 +384,10 @@ fwFit
 ``` r
 #summary(fwFit)
 ```
+
+Here, we have fitted a backward stepwise linear regression model for the
+training dataset having 15 variables. The data is centered and scaled
+and number of shares is the response variable.
 
 ``` r
 #backward stepwise
@@ -391,9 +409,9 @@ bwFit
     ## Resampling results across tuning parameters:
     ## 
     ##   nvmax  RMSE      Rsquared     MAE     
-    ##   2      9799.978  0.003717326  3626.314
-    ##   3      9804.399  0.004915806  3630.710
-    ##   4      9824.213  0.004739317  3647.786
+    ##   2      9272.979  0.008193020  3547.341
+    ##   3      9278.025  0.009162072  3563.281
+    ##   4      9282.440  0.009927219  3583.800
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 2.
@@ -422,11 +440,16 @@ lrFit
     ## Resampling results:
     ## 
     ##   RMSE      Rsquared     MAE     
-    ##   8983.161  0.005559754  3627.885
+    ##   8970.843  0.007650198  3659.286
     ## 
     ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
 ## Random Forest Model
+
+Here, we have fitted a random forest model which is chosen using the
+cross validation method. The RMSE value for the model is as shown below.
+The tuning parameter is given as number of columns in the training data
+divided by 3.
 
 ``` r
 set.seed(111)
@@ -449,12 +472,17 @@ randomFit
     ## Summary of sample sizes: 1176, 1178, 1178, 1178, 1178 
     ## Resampling results:
     ## 
-    ##   RMSE      Rsquared    MAE     
-    ##   9123.384  0.01024489  3783.749
+    ##   RMSE      Rsquared   MAE     
+    ##   9079.444  0.0153692  3845.417
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
 ## Boosted Tree Model
+
+Here, we have fitted a random forest model which is chosen using the
+cross validation method. The RMSE value for the model is as shown below.
+Tuning parameters are n.trees, interaction.depth, shrinkage and
+n.minobsinnode.
 
 ``` r
 set.seed(111)
@@ -482,26 +510,26 @@ boostedFit
     ## Resampling results across tuning parameters:
     ## 
     ##   interaction.depth  n.trees  RMSE      Rsquared     MAE     
-    ##   1                   25      9004.486  0.003738019  3591.563
-    ##   1                   50      9039.288  0.004726933  3599.448
-    ##   1                  100      9066.086  0.005349205  3603.760
-    ##   1                  150      9151.304  0.005543044  3647.226
-    ##   1                  200      9165.702  0.004644262  3663.997
-    ##   2                   25      9079.858  0.005125629  3618.520
-    ##   2                   50      9177.102  0.006511629  3666.499
-    ##   2                  100      9307.758  0.005312415  3791.247
-    ##   2                  150      9334.711  0.006592770  3801.339
-    ##   2                  200      9445.209  0.008105837  3885.666
-    ##   3                   25      9079.659  0.010071723  3670.427
-    ##   3                   50      9215.029  0.009249126  3735.285
-    ##   3                  100      9342.434  0.010310894  3833.884
-    ##   3                  150      9395.307  0.010345525  3902.359
-    ##   3                  200      9451.649  0.009580368  3957.343
-    ##   4                   25      9134.564  0.007450924  3658.033
-    ##   4                   50      9130.482  0.013540063  3681.188
-    ##   4                  100      9298.116  0.011840821  3803.806
-    ##   4                  150      9334.298  0.012007943  3863.891
-    ##   4                  200      9433.876  0.015328202  3925.800
+    ##   1                   25      8953.702  0.003159165  3584.289
+    ##   1                   50      8997.896  0.003871570  3607.446
+    ##   1                  100      9077.728  0.003616975  3631.280
+    ##   1                  150      9108.727  0.004490847  3680.712
+    ##   1                  200      9113.660  0.005411222  3697.026
+    ##   2                   25      9063.631  0.006090211  3661.979
+    ##   2                   50      9128.621  0.010047483  3709.188
+    ##   2                  100      9285.114  0.007828839  3858.148
+    ##   2                  150      9370.030  0.006998956  3885.016
+    ##   2                  200      9490.299  0.007632278  3963.874
+    ##   3                   25      9081.643  0.012031111  3687.102
+    ##   3                   50      9260.288  0.012390275  3759.051
+    ##   3                  100      9460.182  0.015109663  3910.637
+    ##   3                  150      9547.100  0.016150718  4007.855
+    ##   3                  200      9581.516  0.019369816  4075.979
+    ##   4                   25      9087.544  0.007436712  3659.481
+    ##   4                   50      9225.559  0.011798961  3773.351
+    ##   4                  100      9368.988  0.012649098  3936.641
+    ##   4                  150      9431.875  0.016751636  4031.131
+    ##   4                  200      9582.474  0.015408466  4150.048
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
     ## Tuning parameter 'n.minobsinnode' was held
@@ -511,7 +539,7 @@ boostedFit
 
 # Comparison
 
-All the models are compared by RMSE on the test set
+All the models are compared by RMSE on the test set.
 
 ``` r
 #fit a linear regression model
@@ -537,7 +565,7 @@ tibble(model = c("Forward",
 
 # Automation
 
-``` automate
+``` r
 #create channel names
 channelIDs <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
 #create filenames
