@@ -95,7 +95,7 @@ newsTest <- news[-trainIndex,]
 For this part, we created some basic summary statistics and plots about
 the training data.
 
-## Tables
+-   Tables
 
 Firstly, let’s look at some tables. We summarized the training data, so
 that we can know all of the variables roughly. For example, this table
@@ -314,7 +314,7 @@ table(newsTrain$subject_activity_type)
     ##   High    Low Medium 
     ##    161    930    381
 
-## Plots
+-   Plots
 
 Plotting the correlation between numeric variables.
 
@@ -449,7 +449,7 @@ Test <- newsTest %>%
 
 # Model
 
-## Linear Regression Model
+-   Linear Regression Model
 
 Here, we have fitted a forward stepwise linear regression model for the
 training dataset having 15 variables. The data is centered and scaled
@@ -545,7 +545,7 @@ lrFit
     ## 
     ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
-## Random Forest Model
+-   Random Forest Model
 
 Here, we have fitted a random forest model which is chosen using the
 cross validation method. The RMSE value for the model is as shown below.
@@ -578,12 +578,10 @@ randomFit
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
-## Boosted Tree Model
-
-Here, we have fitted a random forest model which is chosen using the
-cross validation method. The RMSE value for the model is as shown below.
-Tuning parameters are n.trees, interaction.depth, shrinkage and
-n.minobsinnode.
+-   Boosted Tree Model Here, we have fitted a random forest model which
+    is chosen using the cross validation method. The RMSE value for the
+    model is as shown below. Tuning parameters are n.trees,
+    interaction.depth, shrinkage and n.minobsinnode.
 
 ``` r
 set.seed(111)

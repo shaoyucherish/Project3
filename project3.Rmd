@@ -81,7 +81,7 @@ newsTest <- news[-trainIndex,]
 
 For this part, we created some basic summary statistics and plots about the training data.
 
-## Tables
+- Tables
 
 Firstly, let's look at some tables. We summarized the training data, so that we can know all of the variables roughly. For example, this table shows each count for published on weekdays, we can see which has the most count and which has the least count. It also shows the minimum, 1st quantile, median, mean, 3rd quantile and maximum of other variables.
 ```{r}
@@ -125,7 +125,7 @@ newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "
 table(newsTrain$subject_activity_type)
 ```
 
-## Plots
+- Plots
 
 Plotting the correlation between numeric variables. 
 ```{r}
@@ -218,7 +218,7 @@ Test <- newsTest %>%
 
 # Model
 
-## Linear Regression Model
+- Linear Regression Model
 
 Here, we have fitted a forward stepwise linear regression model for the training dataset having 15 variables. The data is centered and scaled and number of shares is the response variable.
 ```{r}
@@ -251,7 +251,7 @@ lrFit <- train(shares ~ ., data = Train,
 lrFit
 ```
 
-## Random Forest Model
+- Random Forest Model
 
 Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. The tuning parameter is given as number of columns in the training data divided by 3.
 ```{r}
@@ -265,7 +265,7 @@ randomFit <- train(shares ~ .,
 randomFit
 ```
 
-## Boosted Tree Model
+- Boosted Tree Model
 Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. Tuning parameters are n.trees, interaction.depth, shrinkage and n.minobsinnode.
 ```{r}
 set.seed(111)
