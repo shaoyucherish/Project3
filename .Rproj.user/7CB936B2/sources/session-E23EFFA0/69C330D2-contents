@@ -312,7 +312,7 @@ tibble(model = c("Forward",
 
 ```{r, include=TRUE, eval=FALSE}
 #create channel names
-channelIDs <- data.frame("lifestyle","entertainment","bus","socmed","tech","world")
+channelIDs <- data.frame("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
 #create filenames
 output_file <- paste0(channelIDs,".md")
 #create a list for each channel with the channel name parameter
