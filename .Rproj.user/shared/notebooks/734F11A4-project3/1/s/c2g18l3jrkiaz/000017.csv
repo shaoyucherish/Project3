@@ -1,4 +1,0 @@
-"0","g <- ggplot(newsTrain, aes(x = n_tokens_title))"
-"0","g + geom_histogram(fill = ""lightblue"", binwidth = 1) + "
-"0","  labs(x = ""Number of words in the title"","
-"0","       title = ""Histogram: Number of words in the title"")"
