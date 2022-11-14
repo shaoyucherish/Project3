@@ -26,7 +26,7 @@ This [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/O
 
 # Required Packages
 
-First, we will load the required packages:
+First, we need to load the required packages:
 ```{r}
 # Load libraries
 library(readr)
@@ -266,6 +266,7 @@ randomFit
 ```
 
 - Boosted Tree Model
+
 Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. Tuning parameters are n.trees, interaction.depth, shrinkage and n.minobsinnode.
 ```{r}
 set.seed(111)

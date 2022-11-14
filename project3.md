@@ -12,7 +12,7 @@ Mashable in a period of two years.
 
 # Required Packages
 
-First, we will load the required packages:
+First, we need to load the required packages:
 
 ``` r
 # Load libraries
@@ -578,10 +578,12 @@ randomFit
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
--   Boosted Tree Model Here, we have fitted a random forest model which
-    is chosen using the cross validation method. The RMSE value for the
-    model is as shown below. Tuning parameters are n.trees,
-    interaction.depth, shrinkage and n.minobsinnode.
+-   Boosted Tree Model
+
+Here, we have fitted a random forest model which is chosen using the
+cross validation method. The RMSE value for the model is as shown below.
+Tuning parameters are n.trees, interaction.depth, shrinkage and
+n.minobsinnode.
 
 ``` r
 set.seed(111)
