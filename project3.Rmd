@@ -20,9 +20,7 @@ rmarkdown::render("project3.Rmd",
 
 # Introduction
 
-This [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years.
-
-
+This [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years. There are 61 attributes, including 58 predictive attributes, 2 non-predictive, 1 goal field. The number of shares is our target variable, and we select predictive variables from the remaining variables based on the exploratory data analysis. The purpose of our analysis is to predict the the number of shares. During this project, we read and subset the data set at first, and split data into training set and test set, then we create some basic summary statistics and plots about the training data, at last we fit linear regression models and ensemble tree-based models and test the predictions.
 
 # Required Packages
 
@@ -42,7 +40,7 @@ library(randomForest)
 
 # Data
 
-Read in the data and subset the data to work on the data channel of interest. We found that there are seven similar columns for weekday from Monday to Sunday, so we merged these columns and named the new variable as `publish_weekday`. For this step, we also removed the non-predictive variables.
+Read in the data and subset the data to work on the data channel of interest. We find that there are seven similar columns for weekdays from Monday to Sunday, so we merge these columns and name the new variable as `publish_weekday` and convert it to factor. For this step, we also remove the non-predictive variables.
 
 ```{r}
 #Read in the data file
@@ -64,6 +62,7 @@ news <- newsData %>%
   left_join(newsData, by = "url") %>% 
 #Remove non predictive variables
   select(-c(url, name, value, timedelta, starts_with("data_channel_is_"), starts_with("weekday_is_")))
+#convert publish_weekday to factor
 news$publish_weekday <- as.factor(news$publish_weekday)
 news
 ```
@@ -79,16 +78,16 @@ newsTest <- news[-trainIndex,]
 
 # Summarizations
 
-For this part, we created some basic summary statistics and plots about the training data.
+For this part, we produce some basic summary statistics and plots about the training data.
 
-- Tables
+- **Tables**
 
-Firstly, let's look at some tables. We summarized the training data, so that we can know all of the variables roughly. For example, this table shows each count for published on weekdays, we can see which has the most count and which has the least count. It also shows the minimum, 1st quantile, median, mean, 3rd quantile and maximum of other variables.
+Firstly, here is a quick summary of all variables as shown below, so that we can know the variables roughly.
 ```{r}
 summary(newsTrain)
 ```
 
-Then we can check our response variable `shares`. It shows that the mean, standard deviation, median, IQR of `shares` as follows.
+Then we can check our response variable `shares`. The below table shows that the mean, standard deviation, median, IQR of `shares`.
 ```{r}
 #numerical summary for the variable shares
 newsTrain %>% 
@@ -96,13 +95,9 @@ newsTrain %>%
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
-We also obtain the numerical summaries on some subgroups.
+We also obtain the numerical summaries on some subgroups. We choose four example subgroups: number of images, number of videos, and number of keywords, since people may concern more on these when they do searching and sharing.
 ```{r}
 #numerical summaries on subgroups
-newsTrain %>% 
-  group_by(publish_weekday) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
-            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 newsTrain %>% 
   group_by(num_imgs) %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
@@ -131,17 +126,25 @@ newsTrain$subject_activity_type <- ifelse(newsTrain$title_subjectivity >= 0.8, "
 table(newsTrain$subject_activity_type)
 ```
 
-- Plots
+- **Plots**
 
-Plotting the correlation between numeric variables. 
+At the beginning, let's plot the correlation between the numeric variables.
 ```{r}
 newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))
 correlation <- cor(newsTrainsub, method = "spearman")
 corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
-From the correlation graph above, we can see that some variables are strongly correlated.
+From the correlation graph above, we can see that the following variables seem to be moderately correlated:
+  - `n_tokends_contents`, `n_unique_tokens`, `n_non_stop_words`, `n_non_stop_unique_tokens`, `num_hrefs`, `num_imgs`
+  - `kw_min_min`, `kw_max_min`, `kw_avg_min`, `kw_min_max`, `kw_max_max`, `kw_avg_max`, `kw_min_avg`, `kw_max_avg`, `kw_avg_avg`
+  - `self_reference_min_shares`, `self_reference_max_shares`, `self_reference_avg_sharess`
+  - `LDA_00`, `LDA_01`, `LDA_02`, `LDA_03`
+  - `global_sentiment_polarity`, `global_rate_positive_words`, `global_rate_negative_words`, `rate_positive_words`, `rate_negative_words`
+  - `avg_positive_polarity`, `min_positive_polarity`, `max_positive_polarity`
+  - `avg_negative_polarity`, `min_negative_polarity`, `max_negative_polarity`
+  - `title_subjectivity`, `title_sentiment_polarity`, `abs_title_subjectivity`, `abs_title_sentiment_polarity`
 
-For further EDA, we are plotting several graphs to see trends between different variables with respect to the number of shares.
+For further EDA, we are plotting graphs to see trends between different variables with respect to the number of shares.
 
 A plot between number of shares and article published day: This plot shows the number of shares an article has based on the day it has been published.
 ```{r}
@@ -151,67 +154,95 @@ newsTrainday <- newsTrain %>%
   summarise(total_shares=sum(shares))
 
 g <- ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))
-g + geom_col(fill = "lightblue")+
+g + geom_col(fill = "lightblue", color = "black") +
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-Here, we have plotted the histogram for number of words in a title for the data. It can be seen that the graph shows the variable following normal distribution.
+Let's select some variables as example to plot scatter plots.
+
+A scatter plot with the number of shares on the y-axis and the number of words in the title on the x-axis is created:
 ```{r}
-g <- ggplot(newsTrain, aes(x = n_tokens_title))
-g + geom_histogram(fill = "lightblue", binwidth = 1) + 
-  labs(x = "Number of words in the title",
-       title = "Histogram: Number of words in the title")
+g <- ggplot(data = newsTrain, aes(x = n_tokens_title, y = shares))
+g + geom_point() +
+  labs(x = "Number of words in the title", y = "Number of shares", 
+       title = "Scatter Plot: Number of words in the title VS Number of shares")
+```
+We can inspect the trend of shares as a function of the number of words in the title. Therefore, we can see that the number of words in title has an effect on the number of shares.
+
+A scatter plot with the number of shares on the y-axis and the number of words in the content on the x-axis is created:
+```{r}
+g <- ggplot(data = newsTrain, aes(x = n_tokens_content, y = shares))
+g + geom_point() +
+  labs(x = "Number of words in the content", y = "Number of shares", 
+       title = "Scatter Plot: Number of words in the content VS Number of shares") 
 ```
 
-Then we have plotted the histogram for number of words in content for the data.
-```{r}
-g <- ggplot(newsTrain, aes(x = n_tokens_content))
-g + geom_histogram(fill = "lightblue") + 
-  labs(x = "Number of words in the content", 
-       title = "Histogram: Number of words in the content")
-```
-
-A histogram for text subjectivity.
-```{r}
-g <- ggplot(newsTrain, aes(x = global_subjectivity))
-g + geom_histogram(fill = "lightblue") + 
-  labs(x = "Text subjectivity", 
-       title = "Histogram: Text subjectivity")
-```
-
-A histogram for text sentiment polarity.
-```{r}
-g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
-g + geom_histogram(fill = "lightblue") + 
-  labs(x = "Text sentiment polarity", 
-       title = "Histogram: Text sentiment polarity")
-```
-
-A plot between number of images and number of shares. 
+A scatter plot with the number of shares on the y-axis and the number of images on the x-axis is created:
 ```{r}
 g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
 g + geom_point() +
-  labs(x = "Number of images" , y = "Number of shares", 
-       title = "Scatter Plot: Number of images VS Number of shares") 
+  labs(x = "Number of images", y = "Number of shares", 
+       title = "Scatter Plot: Number of images VS Number of shares")
 ```
 
-A plot between average length of words in content and number of shares: We can inspect the trend of the shares as a function of average length of words in content.
+A scatter plot with the number of shares on the y-axis and the number of videos on the x-axis is created:
+```{r}
+g <- ggplot(data = newsTrain, aes(x = num_videos, y = shares))
+g + geom_point() +
+  labs(x = "Number of videos", y = "Number of shares", 
+       title = "Scatter Plot: Number of videos VS Number of shares") 
+```
+
+A scatter plot with the number of shares on the y-axis and the average length of words in content on the x-axis is created:
 ```{r}
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
 g + geom_point() + 
-  labs(x = "Average token length" , y = "Number of shares", 
+  labs(x = "Average token length", y = "Number of shares", 
        title = "Scatter Plot: Average token length VS Number of shares")
 ```
 
-A plot between title subjectivity and number of shares: We can inspect the trend of the shares as a function of title subjectivity. 
+A scatter plot with the number of shares on the y-axis and the number of keywords in the metadata on the x-axis is created:
+```{r}
+g <- ggplot(newsTrain, aes(x = num_keywords, y = shares))
+g + geom_point() + 
+  labs(x = "Number of keywords in the metadata", y = "Number of shares", 
+       title = "Scatter Plot: Number of keywords in the metadata VS Number of shares")
+```
+
+A scatter plot with the number of shares on the y-axis and the text subjectivity on the x-axis is created:
+```{r}
+g <- ggplot(data = newsTrain, aes(x = global_subjectivity, y = shares))
+g + geom_point() + 
+  labs(x = "Text subjectivity", y = "Number of shares", 
+       title = "Scatter Plot: Text subjectivity VS Number of shares")
+```
+
+
+A scatter plot with the number of shares on the y-axis and the title subjectivity on the x-axis is created: 
 ```{r}
 g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
 g + geom_point() + 
-  labs(x = "Title subjectivity" , y = "Number of shares", 
-       title = "Scatter Plot: Title subjectivity VS Number of shares") 
+  labs(x = "Title subjectivity", y = "Number of shares", 
+       title = "Scatter Plot: Title subjectivity VS Number of shares")
 ```
 
-Select predictors: publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares.
+
+Through the analysis above, we will select predictors as follows: 
+  - publish_weekday
+  - n_tokens_title
+  - n_tokens_content
+  - num_imgs
+  - average_token_length
+  - num_keywords
+  - kw_avg_avg
+  - self_reference_avg_sharess
+  - LDA_04
+  - global_subjectivity
+  - global_sentiment_polarity
+  - avg_positive_polarity
+  - avg_negative_polarity
+  - title_subjectivity
+
 ```{r}
 set.seed(111)
 Train <- newsTrain %>% 
@@ -223,7 +254,7 @@ Test <- newsTest %>%
 
 # Model
 
-- Linear Regression Model
+- **Linear Regression Model**
 
 Here, we have fitted a forward stepwise linear regression model for the training dataset having 15 variables. The data is centered and scaled and number of shares is the response variable.
 ```{r}
@@ -258,7 +289,7 @@ lrFit <- train(shares ~ ., data = Train,
 lrFit
 ```
 
-- Random Forest Model
+- **Random Forest Model**
 
 Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. The tuning parameter is given as number of columns in the training data divided by 3.
 ```{r}
@@ -272,7 +303,7 @@ randomFit <- train(shares ~ .,
 randomFit
 ```
 
-- Boosted Tree Model
+- **Boosted Tree Model**
 
 Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. Tuning parameters are n.trees, interaction.depth, shrinkage and n.minobsinnode.
 ```{r}
