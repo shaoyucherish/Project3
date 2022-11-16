@@ -603,7 +603,8 @@ padding-top: 0px;
 
 <h1 id="project-3">Project 3</h1>
 <p>Shaoyu Wang, Aniket Walimbe 2022-11-16</p>
-<h1 id="data-channel-socmed">Data Channel: socmed</h1>
+<h1 id="the-analysis-for-socmed-data-channel">The Analysis for socmed
+Data Channel</h1>
 <h2 id="introduction">Introduction</h2>
 <p>This <a href="https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity">online
 news popularity data set</a> summarizes a heterogeneous set of features
@@ -655,8 +656,8 @@ words</li>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaps)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span></code></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span></code></pre></div>
 <h2 id="data">Data</h2>
 <p>Read in the data and subset the data to work on the data channel of
 interest. We find that there are seven similar columns for weekdays from
@@ -1160,10 +1161,10 @@ is the response variable.</p>
 ## 
 ## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
 <p><strong>Random Forest Model</strong></p>
-<p>Next, we have fitted a random forest model which is an example of an
-ensemble based-tree model. Instead of traditional decision trees, a
-random forest tree will take a random subset of the predictors for each
-tree fit and calculate the average of results.</p>
+<p>Next, we fit a random forest model which is an example of an ensemble
+based-tree model. Instead of traditional decision trees, a random forest
+tree will take a random subset of the predictors for each tree fit and
+calculate the average of results.</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">111</span>)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>randomFit <span class="ot">&lt;-</span> <span class="fu">train</span>(shares <span class="sc">~</span> ., </span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> Train, </span>
@@ -1187,10 +1188,10 @@ tree fit and calculate the average of results.</p>
 ## 
 ## Tuning parameter &#39;mtry&#39; was held constant at a value of 5.333333</code></pre>
 <p><strong>Boosted Tree Model</strong></p>
-<p>Moreover, we have fitted a boosted tree model which is another
-ensemble based-tree model. Boosted tree models are combination of two
-techniques: decision tree algorithms and boosting methods. It repeatedly
-fits many decision trees to improve the accuracy of the model.</p>
+<p>Moreover, we fit a boosted tree model which is another ensemble
+based-tree model. Boosted tree models are combination of two techniques:
+decision tree algorithms and boosting methods. It repeatedly fits many
+decision trees to improve the accuracy of the model.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">111</span>)</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>boostedFit <span class="ot">&lt;-</span> <span class="fu">train</span>(shares <span class="sc">~</span> ., </span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> Train, </span>
@@ -1252,16 +1253,17 @@ fits many decision trees to improve the accuracy of the model.</p>
 <span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co">#boosted tree</span></span>
 <span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>boosted_mod <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="fu">predict</span>(boostedFit, <span class="at">newdata =</span> Test), <span class="at">obs =</span> Test<span class="sc">$</span>shares)</span>
 <span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co">#compare all models</span></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;Forward&quot;</span>,</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;Backward&quot;</span>,</span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;LR with all predictors&quot;</span>,</span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;Random Forest&quot;</span>,</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;Boosted Tree&quot;</span>), </span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">RMSE =</span> <span class="fu">c</span>(fw_mod[<span class="dv">1</span>],</span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>                bw_mod[<span class="dv">1</span>],</span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>                lr_mod[<span class="dv">1</span>],</span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>                random_mod[<span class="dv">1</span>],</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>                boosted_mod[<span class="dv">1</span>]))</span></code></pre></div>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>result_table <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;Forward&quot;</span>,</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;Backward&quot;</span>,</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;LR with all predictors&quot;</span>,</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;Random Forest&quot;</span>,</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;Boosted Tree&quot;</span>), </span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">RMSE =</span> <span class="fu">c</span>(fw_mod[<span class="dv">1</span>],</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>                                bw_mod[<span class="dv">1</span>],</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>                                lr_mod[<span class="dv">1</span>],</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>                                random_mod[<span class="dv">1</span>],</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>                                boosted_mod[<span class="dv">1</span>]))</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>result_table</span></code></pre></div>
 <pre><code>## # A tibble: 5 × 2
 ##   model                   RMSE
 ##   &lt;chr&gt;                  &lt;dbl&gt;
@@ -1270,10 +1272,11 @@ fits many decision trees to improve the accuracy of the model.</p>
 ## 3 LR with all predictors 6635.
 ## 4 Random Forest          6589.
 ## 5 Boosted Tree           6619.</code></pre>
-<p>From the above table, we can find that forward and backward stepwise
-models have the same RMSE value. So we can say that, among these models,
-the best model is forward or backward stepwise model since it has the
-least RMSE value as compared to the other models.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>min_value <span class="ot">&lt;-</span> <span class="fu">min</span>(result_table<span class="sc">$</span>RMSE)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>best_model <span class="ot">&lt;-</span> result_table[result_table<span class="sc">$</span>RMSE <span class="sc">==</span> min_value, <span class="st">&quot;model&quot;</span>]</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;The best model based on the lowest RMSE value is &quot;</span>,<span class="fu">as.character</span>(best_model[<span class="dv">1</span>,<span class="dv">1</span>]),<span class="st">&quot; with an RMSE value of &quot;</span>,<span class="fu">as.character</span>(<span class="fu">round</span>(min_value,<span class="dv">2</span>))))</span></code></pre></div>
+<pre><code>## [1] &quot;The best model based on the lowest RMSE value is Random Forest with an RMSE value of 6588.85&quot;</code></pre>
 <h2 id="automation">Automation</h2>
 <p>For this automation part, we want to produce the similar reports for
 each news channels. We firstly create a set of parameters, which match
@@ -1281,22 +1284,22 @@ with 6 channels. Then read the parameter and subset the data with the
 specified channel. After everything is ready, run the below chunk of
 code in the console, we will automatically get the reports for each news
 channel.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create channel names</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>channelID <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;lifestyle&quot;</span>, <span class="st">&quot;entertainment&quot;</span>, <span class="st">&quot;bus&quot;</span>, <span class="st">&quot;socmed&quot;</span>, <span class="st">&quot;tech&quot;</span>, <span class="st">&quot;world&quot;</span>)</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#create filenames</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>output_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(channelID,<span class="st">&quot;.md&quot;</span>)</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">#create a list for each channel with the channel name parameter</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>params <span class="ot">=</span> <span class="fu">lapply</span>(channelID, <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">list</span>(<span class="at">channelID =</span> x)})</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co">#put into a data frame</span></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>reports <span class="ot">&lt;-</span> <span class="fu">tibble</span>(output_file, params)</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co">#render code</span></span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(reports, <span class="at">MARGIN =</span> <span class="dv">1</span>,</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">FUN =</span> <span class="cf">function</span>(x){</span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">render</span>(<span class="at">input =</span> <span class="st">&quot;project3.Rmd&quot;</span>,</span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">output_format =</span> <span class="st">&quot;github_document&quot;</span>,</span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">output_file =</span> x[[<span class="dv">1</span>]],</span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">params =</span> x[[<span class="dv">2</span>]])</span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>        })</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create channel names</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>channelID <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;lifestyle&quot;</span>, <span class="st">&quot;entertainment&quot;</span>, <span class="st">&quot;bus&quot;</span>, <span class="st">&quot;socmed&quot;</span>, <span class="st">&quot;tech&quot;</span>, <span class="st">&quot;world&quot;</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">#create filenames</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>output_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(channelID,<span class="st">&quot;.md&quot;</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co">#create a list for each channel with the channel name parameter</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>params <span class="ot">=</span> <span class="fu">lapply</span>(channelID, <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">list</span>(<span class="at">channelID =</span> x)})</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co">#put into a data frame</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>reports <span class="ot">&lt;-</span> <span class="fu">tibble</span>(output_file, params)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="co">#render code</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(reports, <span class="at">MARGIN =</span> <span class="dv">1</span>,</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">FUN =</span> <span class="cf">function</span>(x){</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">render</span>(<span class="at">input =</span> <span class="st">&quot;project3.Rmd&quot;</span>,</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">output_format =</span> <span class="st">&quot;github_document&quot;</span>,</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">output_file =</span> x[[<span class="dv">1</span>]],</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">params =</span> x[[<span class="dv">2</span>]])</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>        })</span></code></pre></div>
 
 </body>
 </html>

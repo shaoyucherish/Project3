@@ -3,7 +3,7 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-# Data Channel: lifestyle
+# The Analysis for lifestyle Data Channel
 
 ## Introduction
 
@@ -58,8 +58,8 @@ library(caret)
 library(leaps)
 library(ggplot2)
 library(corrplot)
-library(GGally)
 library(randomForest)
+library(rmarkdown)
 ```
 
 ## Data
@@ -679,10 +679,10 @@ lrFit
 
 **Random Forest Model**
 
-Next, we have fitted a random forest model which is an example of an
-ensemble based-tree model. Instead of traditional decision trees, a
-random forest tree will take a random subset of the predictors for each
-tree fit and calculate the average of results.
+Next, we fit a random forest model which is an example of an ensemble
+based-tree model. Instead of traditional decision trees, a random forest
+tree will take a random subset of the predictors for each tree fit and
+calculate the average of results.
 
 ``` r
 set.seed(111)
@@ -712,7 +712,7 @@ randomFit
 
 **Boosted Tree Model**
 
-Moreover, we have fitted a boosted tree model which is another ensemble
+Moreover, we fit a boosted tree model which is another ensemble
 based-tree model. Boosted tree models are combination of two techniques:
 decision tree algorithms and boosting methods. It repeatedly fits many
 decision trees to improve the accuracy of the model.
@@ -785,16 +785,17 @@ random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares
 #boosted tree
 boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
 #compare all models
-tibble(model = c("Forward",
-                 "Backward",
-                 "LR with all predictors",
-                 "Random Forest",
-                 "Boosted Tree"), 
-       RMSE = c(fw_mod[1],
-                bw_mod[1],
-                lr_mod[1],
-                random_mod[1],
-                boosted_mod[1]))
+result_table <- tibble(model = c("Forward",
+                                 "Backward",
+                                 "LR with all predictors",
+                                 "Random Forest",
+                                 "Boosted Tree"), 
+                       RMSE = c(fw_mod[1],
+                                bw_mod[1],
+                                lr_mod[1],
+                                random_mod[1],
+                                boosted_mod[1]))
+result_table
 ```
 
     ## # A tibble: 5 × 2
@@ -806,10 +807,14 @@ tibble(model = c("Forward",
     ## 4 Random Forest          5482.
     ## 5 Boosted Tree           5317.
 
-From the above table, we can find that forward and backward stepwise
-models have the same RMSE value. So we can say that, among these models,
-the best model is forward or backward stepwise model since it has the
-least RMSE value as compared to the other models.
+``` r
+min_value <- min(result_table$RMSE)
+best_model <- result_table[result_table$RMSE == min_value, "model"]
+
+print(paste0("The best model based on the lowest RMSE value is ",as.character(best_model[1,1])," with an RMSE value of ",as.character(round(min_value,2))))
+```
+
+    ## [1] "The best model based on the lowest RMSE value is Forward with an RMSE value of 5068.91"
 
 ## Automation
 
