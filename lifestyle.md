@@ -570,6 +570,8 @@ Mashable
 
 The target variable is `shares`.
 
+Let’s do selection for training set and test set.
+
 ``` r
 #select variables for training set and test set
 set.seed(111)
@@ -577,7 +579,6 @@ Train <- newsTrain %>%
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
 Test <- newsTest %>% 
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
-#Train
 ```
 
 ## Model
