@@ -331,7 +331,7 @@ lrFit
 
 **Random Forest Model**
 
-Next, we have fitted a random forest model which is an example of an ensemble based-tree model. Instead of traditional decision trees, a random forest tree will take a random subset of the predictors for each tree fit and calculate the average of results.
+Next, we fit a random forest model which is an example of an ensemble based-tree model. Instead of traditional decision trees, a random forest tree will take a random subset of the predictors for each tree fit and calculate the average of results.
 ```{r}
 set.seed(111)
 randomFit <- train(shares ~ ., 
@@ -345,7 +345,7 @@ randomFit
 
 **Boosted Tree Model**
 
-Moreover, we have fitted a boosted tree model which is another ensemble based-tree model. Boosted tree models are combination of two techniques: decision tree algorithms and boosting methods. It repeatedly fits many decision trees to improve the accuracy of the model.
+Moreover, we fit a boosted tree model which is another ensemble based-tree model. Boosted tree models are combination of two techniques: decision tree algorithms and boosting methods. It repeatedly fits many decision trees to improve the accuracy of the model.
 ```{r}
 set.seed(111)
 boostedFit <- train(shares ~ ., 
@@ -374,17 +374,16 @@ random_mod <- postResample(predict(randomFit, newdata = Test), obs = Test$shares
 #boosted tree
 boosted_mod <- postResample(predict(boostedFit, newdata = Test), obs = Test$shares)
 #compare all models
-tibble(model = c("Forward",
-                 "Backward",
-                 "LR with all predictors",
-                 "Random Forest",
-                 "Boosted Tree"), 
-       RMSE = c(fw_mod[1],
-                bw_mod[1],
-                lr_mod[1],
-                random_mod[1],
-                boosted_mod[1]))
-
+result_table <- tibble(model = c("Forward",
+                                 "Backward",
+                                 "LR with all predictors",
+                                 "Random Forest",
+                                 "Boosted Tree"), 
+                       RMSE = c(fw_mod[1],
+                                bw_mod[1],
+                                lr_mod[1],
+                                random_mod[1],
+                                boosted_mod[1]))
 result_table
 min_value <- min(result_table$RMSE)
 best_model <- result_table[result_table$RMSE == min_value, "model"]
