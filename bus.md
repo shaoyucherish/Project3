@@ -3,15 +3,6 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-- <a href="#data-channel-bus" id="toc-data-channel-bus">Data Channel:
-  bus</a>
-  - <a href="#introduction" id="toc-introduction">Introduction</a>
-  - <a href="#data" id="toc-data">Data</a>
-  - <a href="#summarizations" id="toc-summarizations">Summarizations</a>
-  - <a href="#model" id="toc-model">Model</a>
-  - <a href="#comparison" id="toc-comparison">Comparison</a>
-  - <a href="#automation" id="toc-automation">Automation</a>
-
 # Data Channel: bus
 
 ## Introduction
@@ -839,7 +830,6 @@ apply(reports, MARGIN = 1,
         rmarkdown::render(input = "project3.Rmd",
                           output_format = "github_document",
                           output_file = x[[1]],
-                          params = x[[2]],
-                          output_options = list(toc=TRUE, toc_depth=2, toc_float=TRUE))
+                          params = x[[2]])
         })
 ```
