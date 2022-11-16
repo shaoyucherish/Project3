@@ -834,7 +834,6 @@ apply(reports, MARGIN = 1,
         rmarkdown::render(input = "project3.Rmd",
                           output_format = "github_document",
                           output_file = x[[1]],
-                          params = x[[2]],
-                          output_options = list(toc=TRUE, toc_depth=2, toc_float=TRUE))
+                          params = x[[2]])
         })
 ```
