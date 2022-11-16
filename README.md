@@ -22,12 +22,12 @@ Shaoyu Wang, Aniket Walimbe
 
 # Links to the genterated analyses
 
-[Lifestyle]()
-[Entertainment]()
-[Business]()
-[Social Media]()
-[Tech]()
-[World]()
+[Lifestyle](https://github.com/shaoyucherish/Project3/blob/main/lifestyle.html)  
+[Entertainment](https://github.com/shaoyucherish/Project3/blob/main/entertainment.html)  
+[Business](https://github.com/shaoyucherish/Project3/blob/main/bus.html)  
+[Social Media](https://github.com/shaoyucherish/Project3/blob/main/socmed.html)  
+[Tech](https://github.com/shaoyucherish/Project3/blob/main/tech.html)  
+[World](https://github.com/shaoyucherish/Project3/blob/main/world.html)  
 
 # Automation
 
