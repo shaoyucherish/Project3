@@ -1,27 +1,62 @@
 Project 3
 ================
 Shaoyu Wang, Aniket Walimbe
-2022-11-14
+2022-11-16
 
-- <a href="#introduction" id="toc-introduction">Introduction</a>
-- <a href="#required-packages" id="toc-required-packages">Required
-  Packages</a>
-- <a href="#data" id="toc-data">Data</a>
-- <a href="#summarizations" id="toc-summarizations">Summarizations</a>
-- <a href="#model" id="toc-model">Model</a>
-- <a href="#comparison" id="toc-comparison">Comparison</a>
-- <a href="#automation" id="toc-automation">Automation</a>
+- <a href="#data-channel-entertainment"
+  id="toc-data-channel-entertainment">Data Channel: entertainment</a>
+  - <a href="#introduction" id="toc-introduction">Introduction</a>
+  - <a href="#data" id="toc-data">Data</a>
+  - <a href="#summarizations" id="toc-summarizations">Summarizations</a>
+  - <a href="#model" id="toc-model">Model</a>
+  - <a href="#comparison" id="toc-comparison">Comparison</a>
+  - <a href="#automation" id="toc-automation">Automation</a>
 
-# Introduction
+# Data Channel: entertainment
+
+## Introduction
 
 This [online news popularity data
 set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity)
 summarizes a heterogeneous set of features about articles published by
-Mashable in a period of two years.
+Mashable in a period of two years. There are 61 attributes, including 58
+predictive attributes, 2 non-predictive, 1 goal field. The number of
+shares is our target variable, and we select predictive variables from
+the remaining variables based on the exploratory data analysis. The
+purpose of our analysis is to predict the the number of shares. During
+this project, we read and subset the data set at first, and split data
+into training set and test set, then we create some basic summary
+statistics and plots about the training data, at last we fit linear
+regression models and ensemble tree-based models and test the
+predictions.
 
-# Required Packages
+**Variable information**
 
-First, we need to load the required packages:
+The target variable is the following:  
+- `shares`: Number of shares
+
+The predictive variables are the following:  
+- `publish_weekday`: The article published day  
+- `n_tokens_title`: Number of words in the title  
+- `n_tokens_content`: Number of words in the content  
+- `num_self_hrefs`: Number of links to other articles published by
+Mashable  
+- `num_imgs`: Number of images  
+- `num_videos`: Number of videos  
+- `average_token_length`: Average length of the words in the content  
+- `num_keywords`: Number of keywords in the metadata  
+- `kw_avg_avg`: Avg. keyword (avg. shares)  
+- `self_reference_avg_sharess`: Avg. shares of referenced articles in
+Mashable  
+- `LDA_04`: Closeness to LDA topic 4  
+- `global_subjectivity`: Text subjectivity  
+- `global_sentiment_polarity`: Text sentiment polarity  
+- `avg_positive_polarity`: Avg. polarity of positive words  
+- `avg_negative_polarity`: Avg. polarity of negative words
+
+**Required packages**
+
+We need to load the required packages:
 
 ``` r
 # Load libraries
@@ -36,27 +71,21 @@ library(GGally)
 library(randomForest)
 ```
 
-# Data
+## Data
 
 Read in the data and subset the data to work on the data channel of
-interest. We found that there are seven similar columns for weekday from
-Monday to Sunday, so we merged these columns and named the new variable
-as `publish_weekday`. For this step, we also removed the non-predictive
-variables.
+interest. We find that there are seven similar columns for weekdays from
+Monday to Sunday, so we merge these columns and name the new variable as
+`publish_weekday` and convert it to factor. For this step, we also
+remove the non-predictive variables.
 
 ``` r
 #Read in the data file
-newsData <- read_csv("OnlineNewsPopularity.csv", show_col_types = FALSE)
-#Choose the data channel of interest
-if (params$channelID != "") {
-  paramChannelName <- params$channelID
-} else {
-  paramChannelName <- "lifestyle"
-}
-channelID <- paste("data_channel_is_", paramChannelName, sep = "")
-#Merge the weekday columns as one single column.
+newsData <- read_csv("OnlineNewsPopularity.csv")
+#Select the data channel of interest
+selectChannel <- paste0("data_channel_is_", params[[1]])
 news <- newsData %>% 
-  filter(.data[[channelID]] == 1) %>% 
+  filter(get(selectChannel) == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -64,9 +93,31 @@ news <- newsData %>%
   left_join(newsData, by = "url") %>% 
 #Remove non predictive variables
   select(-c(url, name, value, timedelta, starts_with("data_channel_is_"), starts_with("weekday_is_")))
+#convert publish_weekday to factor
 news$publish_weekday <- as.factor(news$publish_weekday)
 news
 ```
+
+    ## # A tibble: 7,057 × 47
+    ##    publish_…¹ n_tok…² n_tok…³ n_uni…⁴ n_non…⁵ n_non…⁶ num_h…⁷ num_s…⁸ num_i…⁹
+    ##    <fct>        <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 monday          12     219   0.664    1.00   0.815       4       2       1
+    ##  2 monday           9     531   0.504    1.00   0.666       9       0       1
+    ##  3 monday          14     194   0.765    1.00   0.840       4       4       0
+    ##  4 monday          12     161   0.669    1.00   0.752       5       4       0
+    ##  5 monday          11     454   0.566    1.00   0.755       5       3       1
+    ##  6 monday          12     177   0.741    1.00   0.823       4       3       1
+    ##  7 monday           5     356   0.618    1.00   0.766       3       3      12
+    ##  8 tuesday         11     281   0.611    1.00   0.766       5       4       1
+    ##  9 tuesday         10     909   0.450    1.00   0.670       3       2       1
+    ## 10 wednesday       10     413   0.606    1.00   0.729       6       1      13
+    ## # … with 7,047 more rows, 38 more variables: num_videos <dbl>,
+    ## #   average_token_length <dbl>, num_keywords <dbl>, kw_min_min <dbl>,
+    ## #   kw_max_min <dbl>, kw_avg_min <dbl>, kw_min_max <dbl>, kw_max_max <dbl>,
+    ## #   kw_avg_max <dbl>, kw_min_avg <dbl>, kw_max_avg <dbl>, kw_avg_avg <dbl>,
+    ## #   self_reference_min_shares <dbl>, self_reference_max_shares <dbl>,
+    ## #   self_reference_avg_sharess <dbl>, is_weekend <dbl>, LDA_00 <dbl>,
+    ## #   LDA_01 <dbl>, LDA_02 <dbl>, LDA_03 <dbl>, LDA_04 <dbl>, …
 
 Split the data into a training set and a test set.
 
@@ -78,98 +129,135 @@ newsTest <- news[-trainIndex,]
 #newsTrain
 ```
 
-# Summarizations
+## Summarizations
 
-For this part, we created some basic summary statistics and plots about
+For this part, we produce some basic summary statistics and plots about
 the training data.
 
-- Tables
+**Tables**
 
-Firstly, let’s look at some tables. We summarized the training data, so
-that we can know all of the variables roughly. For example, this table
-shows each count for published on weekdays, we can see which has the
-most count and which has the least count. It also shows the minimum, 1st
-quantile, median, mean, 3rd quantile and maximum of other variables.
+Firstly, here is a quick summary of all variables as shown below, so
+that we can know the variables roughly.
 
 ``` r
 summary(newsTrain)
 ```
 
-    ##   publish_weekday n_tokens_title  n_tokens_content n_unique_tokens  n_non_stop_words n_non_stop_unique_tokens
-    ##  friday   :668    Min.   : 3.00   Min.   :   0.0   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000          
-    ##  monday   :948    1st Qu.:10.00   1st Qu.: 253.0   1st Qu.:0.4709   1st Qu.:1.0000   1st Qu.:0.6230          
-    ##  saturday :266    Median :11.00   Median : 428.0   Median :0.5430   Median :1.0000   Median :0.6919          
-    ##  sunday   :372    Mean   :10.99   Mean   : 610.2   Mean   :0.5340   Mean   :0.9735   Mean   :0.6727          
-    ##  thursday :862    3rd Qu.:12.00   3rd Qu.: 810.0   3rd Qu.:0.6181   3rd Qu.:1.0000   3rd Qu.:0.7614          
-    ##  tuesday  :906    Max.   :18.00   Max.   :6505.0   Max.   :0.9355   Max.   :1.0000   Max.   :1.0000          
-    ##  wednesday:919                                                                                               
-    ##    num_hrefs      num_self_hrefs      num_imgs        num_videos     average_token_length  num_keywords   
-    ##  Min.   :  0.00   Min.   : 0.000   Min.   :  0.00   Min.   : 0.000   Min.   :0.000        Min.   : 3.000  
-    ##  1st Qu.:  4.00   1st Qu.: 1.000   1st Qu.:  1.00   1st Qu.: 0.000   1st Qu.:4.427        1st Qu.: 5.000  
-    ##  Median :  7.00   Median : 3.000   Median :  1.00   Median : 1.000   Median :4.585        Median : 7.000  
-    ##  Mean   : 10.72   Mean   : 3.517   Mean   :  6.29   Mean   : 2.624   Mean   :4.486        Mean   : 6.933  
-    ##  3rd Qu.: 13.00   3rd Qu.: 5.000   3rd Qu.:  8.00   3rd Qu.: 1.000   3rd Qu.:4.750        3rd Qu.: 8.000  
-    ##  Max.   :304.00   Max.   :40.000   Max.   :128.00   Max.   :74.000   Max.   :7.696        Max.   :10.000  
-    ##                                                                                                           
-    ##    kw_min_min       kw_max_min       kw_avg_min        kw_min_max       kw_max_max       kw_avg_max    
-    ##  Min.   : -1.00   Min.   :     0   Min.   :   -1.0   Min.   :     0   Min.   :     0   Min.   :     0  
-    ##  1st Qu.: -1.00   1st Qu.:   417   1st Qu.:  124.0   1st Qu.:     0   1st Qu.:843300   1st Qu.:178600  
-    ##  Median : -1.00   Median :   600   Median :  210.8   Median :  1400   Median :843300   Median :231340  
-    ##  Mean   : 21.45   Mean   :  1069   Mean   :  289.3   Mean   : 13203   Mean   :766220   Mean   :243588  
-    ##  3rd Qu.:  4.00   3rd Qu.:   926   3rd Qu.:  323.1   3rd Qu.: 11400   3rd Qu.:843300   3rd Qu.:303775  
-    ##  Max.   :294.00   Max.   :138700   Max.   :34855.1   Max.   :210300   Max.   :843300   Max.   :670750  
-    ##                                                                                                        
-    ##    kw_min_avg     kw_max_avg       kw_avg_avg    self_reference_min_shares self_reference_max_shares
-    ##  Min.   :   0   Min.   :     0   Min.   :    0   Min.   :     0            Min.   :     0           
-    ##  1st Qu.:   0   1st Qu.:  3682   1st Qu.: 2545   1st Qu.:   700            1st Qu.:  1100           
-    ##  Median :1018   Median :  4448   Median : 2964   Median :  1100            Median :  2700           
-    ##  Mean   :1115   Mean   :  5655   Mean   : 3152   Mean   :  2735            Mean   :  8959           
-    ##  3rd Qu.:2056   3rd Qu.:  6015   3rd Qu.: 3547   3rd Qu.:  2000            3rd Qu.:  9200           
-    ##  Max.   :3285   Max.   :138700   Max.   :36023   Max.   :210300            Max.   :837700           
-    ##                                                                                                     
-    ##  self_reference_avg_sharess   is_weekend         LDA_00            LDA_01            LDA_02            LDA_03       
-    ##  Min.   :     0             Min.   :0.0000   Min.   :0.01824   Min.   :0.01898   Min.   :0.01818   Min.   :0.01818  
-    ##  1st Qu.:  1040             1st Qu.:0.0000   1st Qu.:0.02508   1st Qu.:0.04128   1st Qu.:0.02502   1st Qu.:0.03365  
-    ##  Median :  2050             Median :0.0000   Median :0.03333   Median :0.44268   Median :0.03333   Median :0.25041  
-    ##  Mean   :  5064             Mean   :0.1291   Mean   :0.06670   Mean   :0.42521   Mean   :0.09047   Mean   :0.35499  
-    ##  3rd Qu.:  4900             3rd Qu.:0.0000   3rd Qu.:0.05000   3rd Qu.:0.73155   3rd Qu.:0.05015   3rd Qu.:0.69831  
-    ##  Max.   :281685             Max.   :1.0000   Max.   :0.79368   Max.   :0.92595   Max.   :0.78708   Max.   :0.92554  
-    ##                                                                                                                     
-    ##      LDA_04        global_subjectivity global_sentiment_polarity global_rate_positive_words
-    ##  Min.   :0.01818   Min.   :0.0000      Min.   :-0.37766          Min.   :0.00000           
-    ##  1st Qu.:0.02500   1st Qu.:0.4131      1st Qu.: 0.04752          1st Qu.:0.02967           
-    ##  Median :0.03333   Median :0.4651      Median : 0.11381          Median :0.04089           
-    ##  Mean   :0.06264   Mean   :0.4538      Mean   : 0.11179          Mean   :0.04073           
-    ##  3rd Qu.:0.04011   3rd Qu.:0.5143      3rd Qu.: 0.17346          3rd Qu.:0.05147           
-    ##  Max.   :0.71889   Max.   :1.0000      Max.   : 0.72784          Max.   :0.15278           
-    ##                                                                                            
-    ##  global_rate_negative_words rate_positive_words rate_negative_words avg_positive_polarity min_positive_polarity
-    ##  Min.   :0.00000            Min.   :0.0000      Min.   :0.0000      Min.   :0.0000        Min.   :0.00000      
-    ##  1st Qu.:0.01077            1st Qu.:0.5789      1st Qu.:0.2000      1st Qu.:0.3182        1st Qu.:0.05000      
-    ##  Median :0.01724            Median :0.6905      Median :0.3000      Median :0.3725        Median :0.10000      
-    ##  Mean   :0.01919            Mean   :0.6675      Mean   :0.3060      Mean   :0.3663        Mean   :0.09392      
-    ##  3rd Qu.:0.02508            3rd Qu.:0.7857      3rd Qu.:0.4038      3rd Qu.:0.4222        3rd Qu.:0.10000      
-    ##  Max.   :0.09358            Max.   :1.0000      Max.   :1.0000      Max.   :0.8727        Max.   :0.80000      
-    ##                                                                                                                
-    ##  max_positive_polarity avg_negative_polarity min_negative_polarity max_negative_polarity title_subjectivity
-    ##  Min.   :0.0000        Min.   :-1.0000       Min.   :-1.0000       Min.   :-1.0000       Min.   :0.0000    
-    ##  1st Qu.:0.6000        1st Qu.:-0.3697       1st Qu.:-0.8000       1st Qu.:-0.1250       1st Qu.:0.0000    
-    ##  Median :0.8500        Median :-0.3000       Median :-0.6000       Median :-0.1000       Median :0.3000    
-    ##  Mean   :0.7971        Mean   :-0.2945       Mean   :-0.5884       Mean   :-0.1109       Mean   :0.3245    
-    ##  3rd Qu.:1.0000        3rd Qu.:-0.2208       3rd Qu.:-0.4000       3rd Qu.:-0.0500       3rd Qu.:0.5357    
-    ##  Max.   :1.0000        Max.   : 0.0000       Max.   : 0.0000       Max.   : 0.0000       Max.   :1.0000    
-    ##                                                                                                            
-    ##  title_sentiment_polarity abs_title_subjectivity abs_title_sentiment_polarity     shares      
-    ##  Min.   :-1.00000         Min.   :0.0000         Min.   :0.00000              Min.   :    49  
-    ##  1st Qu.: 0.00000         1st Qu.:0.1224         1st Qu.:0.00000              1st Qu.:   833  
-    ##  Median : 0.00000         Median :0.4000         Median :0.08333              Median :  1200  
-    ##  Mean   : 0.06662         Mean   :0.3194         Mean   :0.17554              Mean   :  3075  
-    ##  3rd Qu.: 0.18750         3rd Qu.:0.5000         3rd Qu.:0.30000              3rd Qu.:  2100  
-    ##  Max.   : 1.00000         Max.   :0.5000         Max.   :1.00000              Max.   :210300  
+    ##   publish_weekday n_tokens_title  n_tokens_content n_unique_tokens 
+    ##  friday   :668    Min.   : 3.00   Min.   :   0.0   Min.   :0.0000  
+    ##  monday   :948    1st Qu.:10.00   1st Qu.: 253.0   1st Qu.:0.4709  
+    ##  saturday :266    Median :11.00   Median : 428.0   Median :0.5430  
+    ##  sunday   :372    Mean   :10.99   Mean   : 610.2   Mean   :0.5340  
+    ##  thursday :862    3rd Qu.:12.00   3rd Qu.: 810.0   3rd Qu.:0.6181  
+    ##  tuesday  :906    Max.   :18.00   Max.   :6505.0   Max.   :0.9355  
+    ##  wednesday:919                                                     
+    ##  n_non_stop_words n_non_stop_unique_tokens   num_hrefs      num_self_hrefs  
+    ##  Min.   :0.0000   Min.   :0.0000           Min.   :  0.00   Min.   : 0.000  
+    ##  1st Qu.:1.0000   1st Qu.:0.6230           1st Qu.:  4.00   1st Qu.: 1.000  
+    ##  Median :1.0000   Median :0.6919           Median :  7.00   Median : 3.000  
+    ##  Mean   :0.9735   Mean   :0.6727           Mean   : 10.72   Mean   : 3.517  
+    ##  3rd Qu.:1.0000   3rd Qu.:0.7614           3rd Qu.: 13.00   3rd Qu.: 5.000  
+    ##  Max.   :1.0000   Max.   :1.0000           Max.   :304.00   Max.   :40.000  
+    ##                                                                             
+    ##     num_imgs        num_videos     average_token_length  num_keywords   
+    ##  Min.   :  0.00   Min.   : 0.000   Min.   :0.000        Min.   : 3.000  
+    ##  1st Qu.:  1.00   1st Qu.: 0.000   1st Qu.:4.427        1st Qu.: 5.000  
+    ##  Median :  1.00   Median : 1.000   Median :4.585        Median : 7.000  
+    ##  Mean   :  6.29   Mean   : 2.624   Mean   :4.486        Mean   : 6.933  
+    ##  3rd Qu.:  8.00   3rd Qu.: 1.000   3rd Qu.:4.750        3rd Qu.: 8.000  
+    ##  Max.   :128.00   Max.   :74.000   Max.   :7.696        Max.   :10.000  
+    ##                                                                         
+    ##    kw_min_min       kw_max_min       kw_avg_min        kw_min_max    
+    ##  Min.   : -1.00   Min.   :     0   Min.   :   -1.0   Min.   :     0  
+    ##  1st Qu.: -1.00   1st Qu.:   417   1st Qu.:  124.0   1st Qu.:     0  
+    ##  Median : -1.00   Median :   600   Median :  210.8   Median :  1400  
+    ##  Mean   : 21.45   Mean   :  1069   Mean   :  289.3   Mean   : 13203  
+    ##  3rd Qu.:  4.00   3rd Qu.:   926   3rd Qu.:  323.1   3rd Qu.: 11400  
+    ##  Max.   :294.00   Max.   :138700   Max.   :34855.1   Max.   :210300  
+    ##                                                                      
+    ##    kw_max_max       kw_avg_max       kw_min_avg     kw_max_avg    
+    ##  Min.   :     0   Min.   :     0   Min.   :   0   Min.   :     0  
+    ##  1st Qu.:843300   1st Qu.:178600   1st Qu.:   0   1st Qu.:  3682  
+    ##  Median :843300   Median :231340   Median :1018   Median :  4448  
+    ##  Mean   :766220   Mean   :243588   Mean   :1115   Mean   :  5655  
+    ##  3rd Qu.:843300   3rd Qu.:303775   3rd Qu.:2056   3rd Qu.:  6015  
+    ##  Max.   :843300   Max.   :670750   Max.   :3285   Max.   :138700  
+    ##                                                                   
+    ##    kw_avg_avg    self_reference_min_shares self_reference_max_shares
+    ##  Min.   :    0   Min.   :     0            Min.   :     0           
+    ##  1st Qu.: 2545   1st Qu.:   700            1st Qu.:  1100           
+    ##  Median : 2964   Median :  1100            Median :  2700           
+    ##  Mean   : 3152   Mean   :  2735            Mean   :  8959           
+    ##  3rd Qu.: 3547   3rd Qu.:  2000            3rd Qu.:  9200           
+    ##  Max.   :36023   Max.   :210300            Max.   :837700           
+    ##                                                                     
+    ##  self_reference_avg_sharess   is_weekend         LDA_00       
+    ##  Min.   :     0             Min.   :0.0000   Min.   :0.01824  
+    ##  1st Qu.:  1040             1st Qu.:0.0000   1st Qu.:0.02508  
+    ##  Median :  2050             Median :0.0000   Median :0.03333  
+    ##  Mean   :  5064             Mean   :0.1291   Mean   :0.06670  
+    ##  3rd Qu.:  4900             3rd Qu.:0.0000   3rd Qu.:0.05000  
+    ##  Max.   :281685             Max.   :1.0000   Max.   :0.79368  
+    ##                                                               
+    ##      LDA_01            LDA_02            LDA_03            LDA_04       
+    ##  Min.   :0.01898   Min.   :0.01818   Min.   :0.01818   Min.   :0.01818  
+    ##  1st Qu.:0.04128   1st Qu.:0.02502   1st Qu.:0.03365   1st Qu.:0.02500  
+    ##  Median :0.44268   Median :0.03333   Median :0.25041   Median :0.03333  
+    ##  Mean   :0.42521   Mean   :0.09047   Mean   :0.35499   Mean   :0.06264  
+    ##  3rd Qu.:0.73155   3rd Qu.:0.05015   3rd Qu.:0.69831   3rd Qu.:0.04011  
+    ##  Max.   :0.92595   Max.   :0.78708   Max.   :0.92554   Max.   :0.71889  
+    ##                                                                         
+    ##  global_subjectivity global_sentiment_polarity global_rate_positive_words
+    ##  Min.   :0.0000      Min.   :-0.37766          Min.   :0.00000           
+    ##  1st Qu.:0.4131      1st Qu.: 0.04752          1st Qu.:0.02967           
+    ##  Median :0.4651      Median : 0.11381          Median :0.04089           
+    ##  Mean   :0.4538      Mean   : 0.11179          Mean   :0.04073           
+    ##  3rd Qu.:0.5143      3rd Qu.: 0.17346          3rd Qu.:0.05147           
+    ##  Max.   :1.0000      Max.   : 0.72784          Max.   :0.15278           
+    ##                                                                          
+    ##  global_rate_negative_words rate_positive_words rate_negative_words
+    ##  Min.   :0.00000            Min.   :0.0000      Min.   :0.0000     
+    ##  1st Qu.:0.01077            1st Qu.:0.5789      1st Qu.:0.2000     
+    ##  Median :0.01724            Median :0.6905      Median :0.3000     
+    ##  Mean   :0.01919            Mean   :0.6675      Mean   :0.3060     
+    ##  3rd Qu.:0.02508            3rd Qu.:0.7857      3rd Qu.:0.4038     
+    ##  Max.   :0.09358            Max.   :1.0000      Max.   :1.0000     
+    ##                                                                    
+    ##  avg_positive_polarity min_positive_polarity max_positive_polarity
+    ##  Min.   :0.0000        Min.   :0.00000       Min.   :0.0000       
+    ##  1st Qu.:0.3182        1st Qu.:0.05000       1st Qu.:0.6000       
+    ##  Median :0.3725        Median :0.10000       Median :0.8500       
+    ##  Mean   :0.3663        Mean   :0.09392       Mean   :0.7971       
+    ##  3rd Qu.:0.4222        3rd Qu.:0.10000       3rd Qu.:1.0000       
+    ##  Max.   :0.8727        Max.   :0.80000       Max.   :1.0000       
+    ##                                                                   
+    ##  avg_negative_polarity min_negative_polarity max_negative_polarity
+    ##  Min.   :-1.0000       Min.   :-1.0000       Min.   :-1.0000      
+    ##  1st Qu.:-0.3697       1st Qu.:-0.8000       1st Qu.:-0.1250      
+    ##  Median :-0.3000       Median :-0.6000       Median :-0.1000      
+    ##  Mean   :-0.2945       Mean   :-0.5884       Mean   :-0.1109      
+    ##  3rd Qu.:-0.2208       3rd Qu.:-0.4000       3rd Qu.:-0.0500      
+    ##  Max.   : 0.0000       Max.   : 0.0000       Max.   : 0.0000      
+    ##                                                                   
+    ##  title_subjectivity title_sentiment_polarity abs_title_subjectivity
+    ##  Min.   :0.0000     Min.   :-1.00000         Min.   :0.0000        
+    ##  1st Qu.:0.0000     1st Qu.: 0.00000         1st Qu.:0.1224        
+    ##  Median :0.3000     Median : 0.00000         Median :0.4000        
+    ##  Mean   :0.3245     Mean   : 0.06662         Mean   :0.3194        
+    ##  3rd Qu.:0.5357     3rd Qu.: 0.18750         3rd Qu.:0.5000        
+    ##  Max.   :1.0000     Max.   : 1.00000         Max.   :0.5000        
+    ##                                                                    
+    ##  abs_title_sentiment_polarity     shares      
+    ##  Min.   :0.00000              Min.   :    49  
+    ##  1st Qu.:0.00000              1st Qu.:   833  
+    ##  Median :0.08333              Median :  1200  
+    ##  Mean   :0.17554              Mean   :  3075  
+    ##  3rd Qu.:0.30000              3rd Qu.:  2100  
+    ##  Max.   :1.00000              Max.   :210300  
     ## 
 
-Then we can check our response variable `shares`. It shows that the
-mean, standard deviation, median, IQR of `shares` as follows.
+Then we can check our response variable `shares`. The below table shows
+that the mean, standard deviation, median, IQR of `shares`.
 
 ``` r
 #numerical summary for the variable shares
@@ -178,23 +266,79 @@ newsTrain %>%
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
 
-We also obtain the numerical summaries on some subgroups.
+    ## # A tibble: 1 × 4
+    ##    mean    sd median   IQR
+    ##   <dbl> <dbl>  <dbl> <dbl>
+    ## 1  3075  8525   1200  1267
+
+We also obtain the numerical summaries on some subgroups. We choose four
+example subgroups: number of images, number of videos, and number of
+keywords, since people may concern more on these when they do searching
+and sharing.
 
 ``` r
 #numerical summaries on subgroups
 newsTrain %>% 
-  group_by(publish_weekday) %>% 
-  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
-            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
-newsTrain %>% 
   group_by(num_imgs) %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+```
+
+    ## # A tibble: 72 × 5
+    ##    num_imgs  mean    sd median   IQR
+    ##       <dbl> <dbl> <dbl>  <dbl> <dbl>
+    ##  1        0  3545  7599   1200  1754
+    ##  2        1  2377  6461   1100   997
+    ##  3        2  3020  8868   1100   871
+    ##  4        3  2115  3315   1100  1071
+    ##  5        4  2843  4001   1250  1733
+    ##  6        5  2345  5493   1200   702
+    ##  7        6  2965  4041   1450  1980
+    ##  8        7  1811  1609   1200  1115
+    ##  9        8  4581  9330   1200  2384
+    ## 10        9  2557  3058   1400  1706
+    ## # … with 62 more rows
+
+``` r
+newsTrain %>% 
+  group_by(num_videos) %>% 
+  summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
+            median = round(median(shares), 0), IQR = round(IQR(shares), 0))
+```
+
+    ## # A tibble: 45 × 5
+    ##    num_videos  mean    sd median   IQR
+    ##         <dbl> <dbl> <dbl>  <dbl> <dbl>
+    ##  1          0  2563  7003   1100   998
+    ##  2          1  3632 10534   1200  1644
+    ##  3          2  3418  8800   1200  1540
+    ##  4          3  3240  8094   1200  1510
+    ##  5          4  3477  7971   1300  1200
+    ##  6          5  3220  6596   1500  1949
+    ##  7          6  8195 24034   1300  1339
+    ##  8          7  3406  5219   1300  2298
+    ##  9          8  1839  1770   1100   961
+    ## 10          9  1649  1418   1250   895
+    ## # … with 35 more rows
+
+``` r
 newsTrain %>% 
   group_by(num_keywords) %>% 
   summarise(mean = round(mean(shares), 0), sd = round(sd(shares), 0), 
             median = round(median(shares), 0), IQR = round(IQR(shares), 0))
 ```
+
+    ## # A tibble: 8 × 5
+    ##   num_keywords  mean    sd median   IQR
+    ##          <dbl> <dbl> <dbl>  <dbl> <dbl>
+    ## 1            3  2206  3418   1100   819
+    ## 2            4  2487  6350   1000   741
+    ## 3            5  2519  6039   1100  1002
+    ## 4            6  2857  8596   1100  1189
+    ## 5            7  3592  9568   1200  1339
+    ## 6            8  3075  7141   1200  1459
+    ## 7            9  3918 11169   1300  2094
+    ## 8           10  3171  9822   1300  1646
 
 Moreover, we divide the title subjectivity into 3 categories:  
 1. High: greater than 0.8  
@@ -213,9 +357,10 @@ table(newsTrain$subject_activity_type)
     ##   High    Low Medium 
     ##    550   2741   1650
 
-- Plots
+**Plots**
 
-Plotting the correlation between numeric variables.
+At the beginning, let’s plot the correlation between the numeric
+variables.
 
 ``` r
 newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))
@@ -223,15 +368,32 @@ correlation <- cor(newsTrainsub, method = "spearman")
 corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
 
-![](entertainment_files/figure-gfm/unnamed-chunk-9-1.png)<!-- --> From
-the correlation graph above, we can see that some variables are strongly
-correlated.
+![](entertainment_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-For further EDA, we are plotting several graphs to see trends between
+From the correlation graph above, we can see that the following
+variables seem to be moderately correlated:  
+- `n_tokens_contents`, `n_unique_tokens`, `n_non_stop_words`,
+`n_non_stop_unique_tokens`, `num_hrefs`, `num_imgs`  
+- `kw_min_min`, `kw_max_min`, `kw_avg_min`, `kw_min_max`, `kw_max_max`,
+`kw_avg_max`, `kw_min_avg`, `kw_max_avg`, `kw_avg_avg`  
+- `self_reference_min_shares`, `self_reference_max_shares`,
+`self_reference_avg_sharess`  
+- `LDA_00`, `LDA_01`, `LDA_02`, `LDA_03`  
+- `global_sentiment_polarity`, `global_rate_positive_words`,
+`global_rate_negative_words`, `rate_positive_words`,
+`rate_negative_words`  
+- `avg_positive_polarity`, `min_positive_polarity`,
+`max_positive_polarity`  
+- `avg_negative_polarity`, `min_negative_polarity`,
+`max_negative_polarity`  
+- `title_subjectivity`, `title_sentiment_polarity`,
+`abs_title_subjectivity`, `abs_title_sentiment_polarity`
+
+For further EDA, we are going to plot graphs to see trends between
 different variables with respect to the number of shares.
 
 A plot between number of shares and article published day: This plot
-shows the number of shares an article has based on the day it has been
+shows the number of shares an article has based on the day that has been
 published.
 
 ``` r
@@ -241,124 +403,202 @@ newsTrainday <- newsTrain %>%
   summarise(total_shares=sum(shares))
 
 g <- ggplot(data = newsTrainday, aes(x=publish_weekday, y=total_shares))
-g + geom_col(fill = "lightblue")+
+g + geom_col(fill = "lightblue", color = "black") +
   labs(title = " Shares for articles published based on weekdays")
+```
+
+![](entertainment_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+Let’s select some variables as example to plot scatter plots.
+
+A scatter plot with the number of shares on the y-axis and the number of
+words in the title on the x-axis is created:
+
+``` r
+g <- ggplot(data = newsTrain, aes(x = n_tokens_title, y = shares))
+g + geom_point() +
+  labs(x = "Number of words in the title", y = "Number of shares", 
+       title = "Scatter Plot: Number of words in the title VS Number of shares")
 ```
 
 ![](entertainment_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-Here, we have plotted the histogram for number of words in a title for
-the data. It can be seen that the graph shows the variable following
-normal distribution.
+We can inspect the trend of shares as a function of the number of words
+in the title. Therefore, we can see that the number of words in title
+has an effect on the number of shares.
+
+A scatter plot with the number of shares on the y-axis and the number of
+words in the content on the x-axis is created:
 
 ``` r
-g <- ggplot(newsTrain, aes(x = n_tokens_title))
-g + geom_histogram(fill = "lightblue", binwidth = 1) + 
-  labs(x = "Number of words in the title",
-       title = "Histogram: Number of words in the title")
+g <- ggplot(data = newsTrain, aes(x = n_tokens_content, y = shares))
+g + geom_point() +
+  labs(x = "Number of words in the content", y = "Number of shares", 
+       title = "Scatter Plot: Number of words in the content VS Number of shares") 
 ```
 
 ![](entertainment_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-Then we have plotted the histogram for number of words in content for
-the data.
+From the plot above, we can easily see that the number of shares is
+decreasing while the the number of words in the content is increasing.
+So it can be illustrated that the number of words in the content will
+affect the number of shares.
+
+A scatter plot with the number of shares on the y-axis and the number of
+links to other articles published by Mashable on the x-axis is created:
 
 ``` r
-g <- ggplot(newsTrain, aes(x = n_tokens_content))
-g + geom_histogram(fill = "lightblue") + 
-  labs(x = "Number of words in the content", 
-       title = "Histogram: Number of words in the content")
+g <- ggplot(data = newsTrain, aes(x = num_self_hrefs, y = shares))
+g + geom_point() +
+  labs(x = "Number of links to other articles published by Mashable", y = "Number of shares", 
+       title = "Scatter Plot: Number of links to other articles published by Mashable VS Number of shares")
 ```
 
 ![](entertainment_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
-A histogram for text subjectivity.
+The plot above shows that as the number of links to other articles
+increasing, the number of shares is decreasing. So the the number of
+links to other articles has an infulence on the number of shares.
 
-``` r
-g <- ggplot(newsTrain, aes(x = global_subjectivity))
-g + geom_histogram(fill = "lightblue") + 
-  labs(x = "Text subjectivity", 
-       title = "Histogram: Text subjectivity")
-```
-
-![](entertainment_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-
-A histogram for text sentiment polarity.
-
-``` r
-g <- ggplot(newsTrain, aes(x = global_sentiment_polarity))
-g + geom_histogram(fill = "lightblue") + 
-  labs(x = "Text sentiment polarity", 
-       title = "Histogram: Text sentiment polarity")
-```
-
-![](entertainment_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
-A plot between number of images and number of shares.
+A scatter plot with the number of shares on the y-axis and the number of
+images on the x-axis is created:
 
 ``` r
 g <- ggplot(data = newsTrain, aes(x = num_imgs, y = shares))
 g + geom_point() +
-  labs(x = "Number of images" , y = "Number of shares", 
-       title = "Scatter Plot: Number of images VS Number of shares") 
+  labs(x = "Number of images", y = "Number of shares", 
+       title = "Scatter Plot: Number of images VS Number of shares")
 ```
 
-![](entertainment_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](entertainment_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
-A plot between average length of words in content and number of shares:
-We can inspect the trend of the shares as a function of average length
-of words in content.
+The plot above shows that the number of shares decreases as the number
+of images increasing. Therefore, the number of images will affect the
+number of shares as well.
+
+A scatter plot with the number of shares on the y-axis and the number of
+videos on the x-axis is created:
+
+``` r
+g <- ggplot(data = newsTrain, aes(x = num_videos, y = shares))
+g + geom_point() +
+  labs(x = "Number of videos", y = "Number of shares", 
+       title = "Scatter Plot: Number of videos VS Number of shares") 
+```
+
+![](entertainment_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+A scatter plot with the number of shares on the y-axis and the average
+length of words in content on the x-axis is created:
 
 ``` r
 g <- ggplot(newsTrain, aes(x = average_token_length, y = shares))
 g + geom_point() + 
-  labs(x = "Average token length" , y = "Number of shares", 
+  labs(x = "Average token length", y = "Number of shares", 
        title = "Scatter Plot: Average token length VS Number of shares")
+```
+
+![](entertainment_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+Through the plot above, we can see that the most of shares are between 4
+and 6 words. The average token length will also affect the number of
+shares.
+
+A scatter plot with the number of shares on the y-axis and the number of
+keywords in the metadata on the x-axis is created:
+
+``` r
+g <- ggplot(newsTrain, aes(x = num_keywords, y = shares))
+g + geom_point() + 
+  labs(x = "Number of keywords in the metadata", y = "Number of shares", 
+       title = "Scatter Plot: Number of keywords in the metadata VS Number of shares")
 ```
 
 ![](entertainment_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
-A plot between title subjectivity and number of shares: We can inspect
-the trend of the shares as a function of title subjectivity.
+According to the plot above, we can find that as the number of keywords
+increasing, the number of shares is increasing. So the number of
+keywords in the metadata will influence the number of shares.
+
+A scatter plot with the number of shares on the y-axis and the text
+subjectivity on the x-axis is created:
 
 ``` r
-g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
+g <- ggplot(data = newsTrain, aes(x = global_subjectivity, y = shares))
 g + geom_point() + 
-  labs(x = "Title subjectivity" , y = "Number of shares", 
-       title = "Scatter Plot: Title subjectivity VS Number of shares") 
+  labs(x = "Text subjectivity", y = "Number of shares", 
+       title = "Scatter Plot: Text subjectivity VS Number of shares")
 ```
 
 ![](entertainment_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
-Select predictors: publish_weekday, n_tokens_title, n_tokens_content,
-num_self_hrefs, num_imgs, average_token_length, num_keywords,
-kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity,
-global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity,
-title_subjectivity, shares.
+From the plot above, it presents that the most of shares are between
+0.25 and 0.75 text subjectivity. So the text subjectivity will influence
+the number of shares as well.
+
+A scatter plot with the number of shares on the y-axis and the title
+subjectivity on the x-axis is created:
 
 ``` r
+g <- ggplot(data = newsTrain, aes(x = title_subjectivity, y = shares))
+g + geom_point() + 
+  labs(x = "Title subjectivity", y = "Number of shares", 
+       title = "Scatter Plot: Title subjectivity VS Number of shares")
+```
+
+![](entertainment_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+The plot above shows that the title subjectivity has less effect on the
+number of shares.
+
+**Select variables**
+
+Through the analysis above, we will select predictors as follows:  
+- `publish_weekday`: The article published day  
+- `n_tokens_title`: Number of words in the title  
+- `n_tokens_content`: Number of words in the content  
+- `num_self_hrefs`: Number of links to other articles published by
+Mashable  
+- `num_imgs`: Number of images  
+- `num_videos`: Number of videos  
+- `average_token_length`: Average length of the words in the content  
+- `num_keywords`: Number of keywords in the metadata  
+- `kw_avg_avg`: Avg. keyword (avg. shares)  
+- `self_reference_avg_sharess`: Avg. shares of referenced articles in
+Mashable  
+- `LDA_04`: Closeness to LDA topic 4  
+- `global_subjectivity`: Text subjectivity  
+- `global_sentiment_polarity`: Text sentiment polarity  
+- `avg_positive_polarity`: Avg. polarity of positive words  
+- `avg_negative_polarity`: Avg. polarity of negative words
+
+The target variable is `shares`.
+
+``` r
+#select variables for training set and test set
 set.seed(111)
 Train <- newsTrain %>% 
-  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
 Test <- newsTest %>% 
-  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
 #Train
 ```
 
-# Model
+## Model
 
-- Linear Regression Model
+**Linear Regression Model**
 
-Here, we have fitted a forward stepwise linear regression model for the
-training dataset having 15 variables. The data is centered and scaled
-and number of shares is the response variable.
+First, we fit a forward stepwise linear regression model for the
+training dataset. The data is centered and scaled and number of shares
+is the response variable.
 
 ``` r
 #forward stepwise
 set.seed(111)
 fwFit <- train(shares ~ ., data = Train,
                method = "leapForward",
-               preProcess = c("center", "scale"))
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", number = 5))
 #summary(fwFit)
 fwFit
 ```
@@ -369,28 +609,29 @@ fwFit
     ##   15 predictor
     ## 
     ## Pre-processing: centered (20), scaled (20) 
-    ## Resampling: Bootstrapped (25 reps) 
-    ## Summary of sample sizes: 4941, 4941, 4941, 4941, 4941, 4941, ... 
+    ## Resampling: Cross-Validated (5 fold) 
+    ## Summary of sample sizes: 3952, 3954, 3951, 3954, 3953 
     ## Resampling results across tuning parameters:
     ## 
     ##   nvmax  RMSE      Rsquared    MAE     
-    ##   2      8748.860  0.04301703  3087.662
-    ##   3      8753.378  0.03974416  3093.794
-    ##   4      8755.987  0.03758715  3095.275
+    ##   2      8190.592  0.03410279  3075.283
+    ##   3      8209.241  0.03057667  3102.339
+    ##   4      8214.338  0.02945544  3096.999
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 2.
 
-Here, we have fitted a backward stepwise linear regression model for the
-training dataset having 15 variables. The data is centered and scaled
-and number of shares is the response variable.
+We also fit a backward stepwise linear regression model for the training
+dataset. The data is centered and scaled and number of shares is the
+response variable.
 
 ``` r
 #backward stepwise
 set.seed(111)
 bwFit <- train(shares ~ ., data = Train,
                method = "leapBackward",
-               preProcess = c("center", "scale"))
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", number = 5))
 #summary(bwFit)
 bwFit
 ```
@@ -401,20 +642,22 @@ bwFit
     ##   15 predictor
     ## 
     ## Pre-processing: centered (20), scaled (20) 
-    ## Resampling: Bootstrapped (25 reps) 
-    ## Summary of sample sizes: 4941, 4941, 4941, 4941, 4941, 4941, ... 
+    ## Resampling: Cross-Validated (5 fold) 
+    ## Summary of sample sizes: 3952, 3954, 3951, 3954, 3953 
     ## Resampling results across tuning parameters:
     ## 
     ##   nvmax  RMSE      Rsquared    MAE     
-    ##   2      8748.860  0.04301703  3087.662
-    ##   3      8752.746  0.03992704  3093.474
-    ##   4      8756.728  0.03755621  3096.252
+    ##   2      8190.592  0.03410279  3075.283
+    ##   3      8210.101  0.03051835  3102.714
+    ##   4      8208.925  0.03030603  3093.193
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was nvmax = 2.
 
+Then we fit a linear regression model with all predictors.
+
 ``` r
-#fit a linear regression model with all predictors
+#with all predictors
 set.seed(111)
 lrFit <- train(shares ~ ., data = Train,
                method = "lm",
@@ -433,16 +676,16 @@ lrFit
     ## Resampling results:
     ## 
     ##   RMSE      Rsquared    MAE     
-    ##   8216.212  0.02687093  3104.457
+    ##   8218.052  0.02670598  3101.905
     ## 
     ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
-- Random Forest Model
+**Random Forest Model**
 
-Here, we have fitted a random forest model which is chosen using the
-cross validation method. The RMSE value for the model is as shown below.
-The tuning parameter is given as number of columns in the training data
-divided by 3.
+Next, we have fitted a random forest model which is an example of an
+ensemble based-tree model. Instead of traditional decision trees, a
+random forest tree will take a random subset of the predictors for each
+tree fit and calculate the average of results.
 
 ``` r
 set.seed(111)
@@ -466,16 +709,16 @@ randomFit
     ## Resampling results:
     ## 
     ##   RMSE      Rsquared    MAE     
-    ##   8246.247  0.03144546  3195.717
+    ##   8264.988  0.02918621  3187.129
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
-- Boosted Tree Model
+**Boosted Tree Model**
 
-Here, we have fitted a random forest model which is chosen using the
-cross validation method. The RMSE value for the model is as shown below.
-Tuning parameters are n.trees, interaction.depth, shrinkage and
-n.minobsinnode.
+Moreover, we have fitted a boosted tree model which is another ensemble
+based-tree model. Boosted tree models are combination of two techniques:
+decision tree algorithms and boosting methods. It repeatedly fits many
+decision trees to improve the accuracy of the model.
 
 ``` r
 set.seed(111)
@@ -504,33 +747,34 @@ boostedFit
     ## 
     ##   interaction.depth  n.trees  RMSE      Rsquared    MAE     
     ##   1                   25      8232.290  0.01190099  3092.240
-    ##   1                   50      8238.170  0.01394523  3073.341
-    ##   1                  100      8274.625  0.01248618  3073.521
-    ##   1                  150      8279.491  0.01342043  3089.381
-    ##   1                  200      8291.124  0.01373017  3079.556
-    ##   2                   25      8221.131  0.01731147  3053.737
-    ##   2                   50      8248.689  0.01628512  3070.291
-    ##   2                  100      8292.002  0.01407806  3072.565
-    ##   2                  150      8284.488  0.01572581  3094.601
-    ##   2                  200      8264.979  0.01714413  3070.279
-    ##   3                   25      8250.315  0.01412643  3081.871
-    ##   3                   50      8318.594  0.01486422  3094.659
-    ##   3                  100      8299.238  0.01607287  3069.323
-    ##   3                  150      8348.644  0.01489763  3090.538
-    ##   3                  200      8415.197  0.01188110  3135.866
-    ##   4                   25      8302.134  0.01572348  3077.035
-    ##   4                   50      8330.141  0.01797299  3080.383
-    ##   4                  100      8375.981  0.01632640  3091.314
-    ##   4                  150      8434.000  0.01572561  3132.720
-    ##   4                  200      8408.923  0.01773231  3150.894
+    ##   1                   50      8238.040  0.01397793  3073.013
+    ##   1                  100      8282.896  0.01200359  3076.191
+    ##   1                  150      8278.297  0.01353414  3087.667
+    ##   1                  200      8283.376  0.01377967  3077.659
+    ##   2                   25      8219.809  0.01884333  3057.083
+    ##   2                   50      8225.660  0.01858964  3066.447
+    ##   2                  100      8266.682  0.01691932  3068.898
+    ##   2                  150      8255.534  0.01910960  3086.522
+    ##   2                  200      8233.718  0.02049194  3058.417
+    ##   3                   25      8212.911  0.01944981  3062.769
+    ##   3                   50      8276.240  0.01740588  3078.334
+    ##   3                  100      8258.083  0.01924647  3058.585
+    ##   3                  150      8325.781  0.01717675  3074.808
+    ##   3                  200      8374.294  0.01467412  3114.175
+    ##   4                   25      8297.228  0.01803704  3067.442
+    ##   4                   50      8315.515  0.01962965  3065.197
+    ##   4                  100      8333.954  0.02179281  3073.872
+    ##   4                  150      8404.231  0.01959180  3105.272
+    ##   4                  200      8411.721  0.01827075  3133.068
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
-    ## Tuning parameter 'n.minobsinnode' was held
-    ##  constant at a value of 10
+    ## 
+    ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
     ## RMSE was used to select the optimal model using the smallest value.
-    ## The final values used for the model were n.trees = 25, interaction.depth = 2, shrinkage = 0.1 and n.minobsinnode = 10.
+    ## The final values used for the model were n.trees = 25, interaction.depth
+    ##  = 3, shrinkage = 0.1 and n.minobsinnode = 10.
 
-# Comparison
+## Comparison
 
 All the models are compared by RMSE on the test set.
 
@@ -556,7 +800,28 @@ tibble(model = c("Forward",
                 boosted_mod[1]))
 ```
 
-# Automation
+    ## # A tibble: 5 × 2
+    ##   model                   RMSE
+    ##   <chr>                  <dbl>
+    ## 1 Forward                5961.
+    ## 2 Backward               5961.
+    ## 3 LR with all predictors 5965.
+    ## 4 Random Forest          6119.
+    ## 5 Boosted Tree           6046.
+
+From the above table, we can find that forward and backward stepwise
+models have the same RMSE value. So we can say that, among these models,
+the best model is forward or backward stepwise model since it has the
+least RMSE value as compared to the other models.
+
+## Automation
+
+For this automation part, we want to produce the similar reports for
+each news channels. We firstly create a set of parameters, which match
+with 6 channels. Then read the parameter and subset the data with the
+specified channel. After everything is ready, run the below chunk of
+code in the console, we will automatically get the reports for each news
+channel.
 
 ``` r
 #create channel names
@@ -569,11 +834,11 @@ params = lapply(channelID, FUN = function(x){list(channelID = x)})
 reports <- tibble(output_file, params)
 #render code
 apply(reports, MARGIN = 1,
-          FUN = function(x){
-             rmarkdown::render(input = "project3.Rmd",
-             output_format = "github_document",
-             output_file = x[[1]],
-             params = x[[2]],
-             output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
-             })
+      FUN = function(x){
+        rmarkdown::render(input = "project3.Rmd",
+                          output_format = "github_document",
+                          output_file = x[[1]],
+                          params = x[[2]],
+                          output_options = list(toc=TRUE, toc_depth=2, toc_float=TRUE))
+        })
 ```
