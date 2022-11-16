@@ -3,7 +3,8 @@ Shaoyu Wang, Aniket Walimbe
 
 
 # Description
-The purpose of this repo
+This repo was created by Shaoyu Wang and Aniket Walimbe as a part of Project 3 for the ST 558 - Data Science for Statisticians course. The project involves creating predictive models and automating Markdown reports. The data set analyzed for this project was: [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) which summarizes a heterogeneous set of features about articles published by Mashable in a period of two years. Different regression models were fitted on the data set to determine the best model for prediction of the response variable. The creation of analysis reports were automated for 6 different channels.
+
 
 # A list of R packages used
 
@@ -43,7 +44,6 @@ apply(reports, MARGIN = 1,
              rmarkdown::render(input = "project3.Rmd",
              output_format = "github_document",
              output_file = x[[1]],
-             params = x[[2]],
-             output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
+             params = x[[2]])
              })
 ```
