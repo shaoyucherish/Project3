@@ -135,7 +135,7 @@ correlation <- cor(newsTrainsub, method = "spearman")
 corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
 From the correlation graph above, we can see that the following variables seem to be moderately correlated:
-  - `n_tokends_contents`, `n_unique_tokens`, `n_non_stop_words`, `n_non_stop_unique_tokens`, `num_hrefs`, `num_imgs`
+  - `n_tokens_contents`, `n_unique_tokens`, `n_non_stop_words`, `n_non_stop_unique_tokens`, `num_hrefs`, `num_imgs`
   - `kw_min_min`, `kw_max_min`, `kw_avg_min`, `kw_min_max`, `kw_max_max`, `kw_avg_max`, `kw_min_avg`, `kw_max_avg`, `kw_avg_avg`
   - `self_reference_min_shares`, `self_reference_max_shares`, `self_reference_avg_sharess`
   - `LDA_00`, `LDA_01`, `LDA_02`, `LDA_03`
@@ -144,9 +144,9 @@ From the correlation graph above, we can see that the following variables seem t
   - `avg_negative_polarity`, `min_negative_polarity`, `max_negative_polarity`
   - `title_subjectivity`, `title_sentiment_polarity`, `abs_title_subjectivity`, `abs_title_sentiment_polarity`
 
-For further EDA, we are plotting graphs to see trends between different variables with respect to the number of shares.
+For further EDA, we are going to plot graphs to see trends between different variables with respect to the number of shares.
 
-A plot between number of shares and article published day: This plot shows the number of shares an article has based on the day it has been published.
+A plot between number of shares and article published day: This plot shows the number of shares an article has based on the day that has been published.
 ```{r}
 newsTrainday <- newsTrain %>%
   select(publish_weekday, shares) %>%
@@ -176,6 +176,16 @@ g + geom_point() +
   labs(x = "Number of words in the content", y = "Number of shares", 
        title = "Scatter Plot: Number of words in the content VS Number of shares") 
 ```
+From the plot above, we can easily see that the number of shares is decreasing while the the number of words in the content is increasing. So it can be illustrated that the number of words in the content will affect the number of shares.
+
+A scatter plot with the number of shares on the y-axis and the number of links to other articles published by Mashable on the x-axis is created:
+```{r}
+g <- ggplot(data = newsTrain, aes(x = num_self_hrefs, y = shares))
+g + geom_point() +
+  labs(x = "Number of links to other articles published by Mashable", y = "Number of shares", 
+       title = "Scatter Plot: Number of links to other articles published by Mashable VS Number of shares")
+```
+The plot above shows that as the number of links to other articles increasing, the number of shares is decreasing. So the the number of links to other articles has an infulence on the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the number of images on the x-axis is created:
 ```{r}
@@ -184,6 +194,7 @@ g + geom_point() +
   labs(x = "Number of images", y = "Number of shares", 
        title = "Scatter Plot: Number of images VS Number of shares")
 ```
+The plot above shows that the number of shares decreases as the number of images increasing. Therefore, the number of images will affect the number of shares as well.
 
 A scatter plot with the number of shares on the y-axis and the number of videos on the x-axis is created:
 ```{r}
@@ -200,6 +211,7 @@ g + geom_point() +
   labs(x = "Average token length", y = "Number of shares", 
        title = "Scatter Plot: Average token length VS Number of shares")
 ```
+Through the plot above, we can see that the most of shares are between 4 and 6 words. The average token length will also affect the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the number of keywords in the metadata on the x-axis is created:
 ```{r}
@@ -208,6 +220,7 @@ g + geom_point() +
   labs(x = "Number of keywords in the metadata", y = "Number of shares", 
        title = "Scatter Plot: Number of keywords in the metadata VS Number of shares")
 ```
+According to the plot above, we can find that as the number of keywords increasing, the number of shares is increasing. So the number of keywords in the metadata will influence the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the text subjectivity on the x-axis is created:
 ```{r}
@@ -216,7 +229,7 @@ g + geom_point() +
   labs(x = "Text subjectivity", y = "Number of shares", 
        title = "Scatter Plot: Text subjectivity VS Number of shares")
 ```
-
+From the plot above, it presents that the most of shares are between 0.25 and 0.75 text subjectivity. So the text subjectivity will influence the number of shares as well.
 
 A scatter plot with the number of shares on the y-axis and the title subjectivity on the x-axis is created: 
 ```{r}
@@ -225,30 +238,31 @@ g + geom_point() +
   labs(x = "Title subjectivity", y = "Number of shares", 
        title = "Scatter Plot: Title subjectivity VS Number of shares")
 ```
-
+The plot above shows that the title subjectivity has less effect on the number of shares.
 
 Through the analysis above, we will select predictors as follows: 
-  - publish_weekday
-  - n_tokens_title
-  - n_tokens_content
-  - num_imgs
-  - average_token_length
-  - num_keywords
-  - kw_avg_avg
-  - self_reference_avg_sharess
-  - LDA_04
-  - global_subjectivity
-  - global_sentiment_polarity
-  - avg_positive_polarity
-  - avg_negative_polarity
-  - title_subjectivity
+  - `publish_weekday`: The article published day  
+  - `n_tokens_title`: Number of words in the title  
+  - `n_tokens_content`: Number of words in the content  
+  - `num_self_hrefs`: Number of links to other articles published by Mashable  
+  - `num_imgs`: Number of images  
+  - `num_videos`: Number of videos  
+  - `average_token_length`: Average length of the words in the content  
+  - `num_keywords`: Number of keywords in the metadata  
+  - `kw_avg_avg`: Avg. keyword (avg. shares)  
+  - `self_reference_avg_sharess`: Avg. shares of referenced articles in Mashable  
+  - `LDA_04`: Closeness to LDA topic 4  
+  - `global_subjectivity`: Text subjectivity  
+  - `global_sentiment_polarity`: Text sentiment polarity  
+  - `avg_positive_polarity`: Avg. polarity of positive words
+  - `avg_negative_polarity`: Avg. polarity of negative words
 
 ```{r}
 set.seed(111)
 Train <- newsTrain %>% 
-  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
 Test <- newsTest %>% 
-  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, title_subjectivity, shares)
+  select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
 #Train
 ```
 
@@ -256,7 +270,7 @@ Test <- newsTest %>%
 
 - **Linear Regression Model**
 
-Here, we have fitted a forward stepwise linear regression model for the training dataset having 15 variables. The data is centered and scaled and number of shares is the response variable.
+First, we have fitted a forward stepwise linear regression model for the training dataset. The data is centered and scaled and number of shares is the response variable.
 ```{r}
 #forward stepwise
 set.seed(111)
@@ -268,7 +282,7 @@ fwFit <- train(shares ~ ., data = Train,
 fwFit
 ```
 
-Here, we have fitted a backward stepwise linear regression model for the training dataset having 15 variables. The data is centered and scaled and number of shares is the response variable.
+Then we have fitted a backward stepwise linear regression model for the training dataset. The data is centered and scaled and number of shares is the response variable.
 ```{r}
 #backward stepwise
 set.seed(111)
@@ -280,8 +294,9 @@ bwFit <- train(shares ~ ., data = Train,
 bwFit
 ```
 
+We also fit a linear regression model with all predictors.
 ```{r}
-#fit a linear regression model with all predictors
+#with all predictors
 set.seed(111)
 lrFit <- train(shares ~ ., data = Train,
                method = "lm",
@@ -291,7 +306,7 @@ lrFit
 
 - **Random Forest Model**
 
-Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. The tuning parameter is given as number of columns in the training data divided by 3.
+Next, we have fitted a random forest model which is an example of an ensemble based-tree model. Instead of traditional decision trees, a random forest tree will take a random subset of the predictors for each tree fit and calculate the average of results.
 ```{r}
 set.seed(111)
 randomFit <- train(shares ~ ., 
@@ -305,7 +320,7 @@ randomFit
 
 - **Boosted Tree Model**
 
-Here, we have fitted a random forest model which is chosen using the cross validation method. The RMSE value for the model is as shown below. Tuning parameters are n.trees, interaction.depth, shrinkage and n.minobsinnode.
+Moreover, we have fitted a boosted tree model which is another ensemble based-tree model. Boosted tree models are combination of two techniques: decision tree algorithms and boosting methods. It repeatedly fits many decision trees to improve the accuracy of the model.
 ```{r}
 set.seed(111)
 boostedFit <- train(shares ~ ., 
@@ -345,8 +360,11 @@ tibble(model = c("Forward",
                 random_mod[1],
                 boosted_mod[1]))
 ```
+From above comparison, we can see that the forward and backward have the same RMSE, which is the smallest during these models. Therefore, we will choose this linear regression model with 3 predictors.
 
 # Automation
+
+For this automation part, we want to produce the similar reports for each news channels. We firstly create a set of parameters, which match with 6 news channels. Then read the parameter and subset the data with the specified channel. After everything is ready, run the below chunk of code in the console, we will automatically get the reports for each news channel.
 
 ```{r, include=TRUE, eval=FALSE}
 #create channel names
