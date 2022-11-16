@@ -3,8 +3,7 @@ Shaoyu Wang, Aniket Walimbe
 
 
 # Description
-This repo was created by Shaoyu Wang and Aniket Walimbe as a part of Project 3 for the ST 558 - Data Science for Statisticians course. The project involves creating predictive models and automating Markdown reports. The data set analyzed for this project was: [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) which summarizes a heterogeneous set of features about articles published by Mashable in a period of two years. Different regression models were fitted on the data set to determine the best model for prediction of the response variable. The creation of analysis reports were automated for 6 different channels.
-
+This repo was created by Shaoyu Wang and Aniket Walimbe as a part of Project 3 for the ST 558 - Data Science for Statisticians course. The project involves creating predictive models and automating Markdown reports. The data set we analyzed for this project is [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity), which summarizes a heterogeneous set of features about articles published by Mashable in a period of two years. We fitted regression models and ensemble tree-based models and selected the best model for predicting the response variable. The creation of analysis reports were automated for 6 different news channels.
 
 # A list of R packages used
 
