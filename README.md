@@ -20,7 +20,7 @@ Shaoyu Wang, Aniket Walimbe
 - GGally
 - randomForest
 
-# Links to the genterated analyses
+# Links to the analyses
 
 [Lifestyle](https://github.com/shaoyucherish/Project3/blob/main/lifestyle.html)  
 [Entertainment](https://github.com/shaoyucherish/Project3/blob/main/entertainment.html)  
