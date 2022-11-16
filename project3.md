@@ -58,8 +58,8 @@ library(caret)
 library(leaps)
 library(ggplot2)
 library(corrplot)
-library(GGally)
 library(randomForest)
+library(rmarkdown)
 ```
 
 ## Data
