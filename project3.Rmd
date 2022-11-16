@@ -1,28 +1,23 @@
 ---
 title: "Project 3"
 author: "Shaoyu Wang, Aniket Walimbe"
-date: "2022-11-14"
+date: "`r Sys.Date()`"
 output: github_document
 params: 
-  channelID: ""
+  channelID: "lifestyle"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-```{r, include=FALSE, eval=FALSE}
-rmarkdown::render("project3.Rmd", 
-                  output_format = "github_document",
-                  output_file = "README.md",
-                  output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
-```
+# Data Channel: `r params[[1]]`
 
-# Introduction
+## Introduction
 
 This [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) summarizes a heterogeneous set of features about articles published by Mashable in a period of two years. There are 61 attributes, including 58 predictive attributes, 2 non-predictive, 1 goal field. The number of shares is our target variable, and we select predictive variables from the remaining variables based on the exploratory data analysis. The purpose of our analysis is to predict the the number of shares. During this project, we read and subset the data set at first, and split data into training set and test set, then we create some basic summary statistics and plots about the training data, at last we fit linear regression models and ensemble tree-based models and test the predictions.
 
-# Required Packages
+## Required Packages
 
 First, we need to load the required packages:
 ```{r}
@@ -38,23 +33,17 @@ library(GGally)
 library(randomForest)
 ```
 
-# Data
+## Data
 
 Read in the data and subset the data to work on the data channel of interest. We find that there are seven similar columns for weekdays from Monday to Sunday, so we merge these columns and name the new variable as `publish_weekday` and convert it to factor. For this step, we also remove the non-predictive variables.
 
 ```{r}
 #Read in the data file
-newsData <- read_csv("OnlineNewsPopularity.csv", show_col_types = FALSE)
-#Choose the data channel of interest
-if (params$channelID != "") {
-  paramChannelName <- params$channelID
-} else {
-  paramChannelName <- "lifestyle"
-}
-channelID <- paste("data_channel_is_", paramChannelName, sep = "")
-#Merge the weekday columns as one single column.
+newsData <- read_csv("OnlineNewsPopularity.csv")
+#Select the data channel of interest
+selectChannel <- paste0("data_channel_is_", params[[1]])
 news <- newsData %>% 
-  filter(.data[[channelID]] == 1) %>% 
+  filter(get(selectChannel) == 1) %>% 
   select(url, starts_with("weekday_is_")) %>% 
   pivot_longer(-url) %>% 
   filter(value != 0) %>% 
@@ -76,7 +65,7 @@ newsTest <- news[-trainIndex,]
 #newsTrain
 ```
 
-# Summarizations
+## Summarizations
 
 For this part, we produce some basic summary statistics and plots about the training data.
 
@@ -134,15 +123,16 @@ newsTrainsub <- newsTrain %>% select(-c(publish_weekday, subject_activity_type))
 correlation <- cor(newsTrainsub, method = "spearman")
 corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
-From the correlation graph above, we can see that the following variables seem to be moderately correlated:
-  - `n_tokens_contents`, `n_unique_tokens`, `n_non_stop_words`, `n_non_stop_unique_tokens`, `num_hrefs`, `num_imgs`
-  - `kw_min_min`, `kw_max_min`, `kw_avg_min`, `kw_min_max`, `kw_max_max`, `kw_avg_max`, `kw_min_avg`, `kw_max_avg`, `kw_avg_avg`
-  - `self_reference_min_shares`, `self_reference_max_shares`, `self_reference_avg_sharess`
-  - `LDA_00`, `LDA_01`, `LDA_02`, `LDA_03`
-  - `global_sentiment_polarity`, `global_rate_positive_words`, `global_rate_negative_words`, `rate_positive_words`, `rate_negative_words`
-  - `avg_positive_polarity`, `min_positive_polarity`, `max_positive_polarity`
-  - `avg_negative_polarity`, `min_negative_polarity`, `max_negative_polarity`
-  - `title_subjectivity`, `title_sentiment_polarity`, `abs_title_subjectivity`, `abs_title_sentiment_polarity`
+
+From the correlation graph above, we can see that the following variables seem to be moderately correlated:  
+  - `n_tokens_contents`, `n_unique_tokens`, `n_non_stop_words`, `n_non_stop_unique_tokens`, `num_hrefs`, `num_imgs`  
+  - `kw_min_min`, `kw_max_min`, `kw_avg_min`, `kw_min_max`, `kw_max_max`, `kw_avg_max`, `kw_min_avg`, `kw_max_avg`, `kw_avg_avg`  
+  - `self_reference_min_shares`, `self_reference_max_shares`, `self_reference_avg_sharess`  
+  - `LDA_00`, `LDA_01`, `LDA_02`, `LDA_03`  
+  - `global_sentiment_polarity`, `global_rate_positive_words`, `global_rate_negative_words`, `rate_positive_words`, `rate_negative_words`  
+  - `avg_positive_polarity`, `min_positive_polarity`, `max_positive_polarity`  
+  - `avg_negative_polarity`, `min_negative_polarity`, `max_negative_polarity`  
+  - `title_subjectivity`, `title_sentiment_polarity`, `abs_title_subjectivity`, `abs_title_sentiment_polarity`  
 
 For further EDA, we are going to plot graphs to see trends between different variables with respect to the number of shares.
 
@@ -167,6 +157,7 @@ g + geom_point() +
   labs(x = "Number of words in the title", y = "Number of shares", 
        title = "Scatter Plot: Number of words in the title VS Number of shares")
 ```
+
 We can inspect the trend of shares as a function of the number of words in the title. Therefore, we can see that the number of words in title has an effect on the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the number of words in the content on the x-axis is created:
@@ -176,6 +167,7 @@ g + geom_point() +
   labs(x = "Number of words in the content", y = "Number of shares", 
        title = "Scatter Plot: Number of words in the content VS Number of shares") 
 ```
+
 From the plot above, we can easily see that the number of shares is decreasing while the the number of words in the content is increasing. So it can be illustrated that the number of words in the content will affect the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the number of links to other articles published by Mashable on the x-axis is created:
@@ -185,6 +177,7 @@ g + geom_point() +
   labs(x = "Number of links to other articles published by Mashable", y = "Number of shares", 
        title = "Scatter Plot: Number of links to other articles published by Mashable VS Number of shares")
 ```
+
 The plot above shows that as the number of links to other articles increasing, the number of shares is decreasing. So the the number of links to other articles has an infulence on the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the number of images on the x-axis is created:
@@ -194,6 +187,7 @@ g + geom_point() +
   labs(x = "Number of images", y = "Number of shares", 
        title = "Scatter Plot: Number of images VS Number of shares")
 ```
+
 The plot above shows that the number of shares decreases as the number of images increasing. Therefore, the number of images will affect the number of shares as well.
 
 A scatter plot with the number of shares on the y-axis and the number of videos on the x-axis is created:
@@ -211,6 +205,7 @@ g + geom_point() +
   labs(x = "Average token length", y = "Number of shares", 
        title = "Scatter Plot: Average token length VS Number of shares")
 ```
+
 Through the plot above, we can see that the most of shares are between 4 and 6 words. The average token length will also affect the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the number of keywords in the metadata on the x-axis is created:
@@ -220,6 +215,7 @@ g + geom_point() +
   labs(x = "Number of keywords in the metadata", y = "Number of shares", 
        title = "Scatter Plot: Number of keywords in the metadata VS Number of shares")
 ```
+
 According to the plot above, we can find that as the number of keywords increasing, the number of shares is increasing. So the number of keywords in the metadata will influence the number of shares.
 
 A scatter plot with the number of shares on the y-axis and the text subjectivity on the x-axis is created:
@@ -229,6 +225,7 @@ g + geom_point() +
   labs(x = "Text subjectivity", y = "Number of shares", 
        title = "Scatter Plot: Text subjectivity VS Number of shares")
 ```
+
 From the plot above, it presents that the most of shares are between 0.25 and 0.75 text subjectivity. So the text subjectivity will influence the number of shares as well.
 
 A scatter plot with the number of shares on the y-axis and the title subjectivity on the x-axis is created: 
@@ -238,9 +235,10 @@ g + geom_point() +
   labs(x = "Title subjectivity", y = "Number of shares", 
        title = "Scatter Plot: Title subjectivity VS Number of shares")
 ```
+
 The plot above shows that the title subjectivity has less effect on the number of shares.
 
-Through the analysis above, we will select predictors as follows: 
+Through the analysis above, we will select predictors as follows:  
   - `publish_weekday`: The article published day  
   - `n_tokens_title`: Number of words in the title  
   - `n_tokens_content`: Number of words in the content  
@@ -254,10 +252,11 @@ Through the analysis above, we will select predictors as follows:
   - `LDA_04`: Closeness to LDA topic 4  
   - `global_subjectivity`: Text subjectivity  
   - `global_sentiment_polarity`: Text sentiment polarity  
-  - `avg_positive_polarity`: Avg. polarity of positive words
-  - `avg_negative_polarity`: Avg. polarity of negative words
+  - `avg_positive_polarity`: Avg. polarity of positive words  
+  - `avg_negative_polarity`: Avg. polarity of negative words  
 
 ```{r}
+#select variables for training set and test set
 set.seed(111)
 Train <- newsTrain %>% 
   select(publish_weekday, n_tokens_title, n_tokens_content, num_self_hrefs, num_imgs, num_videos, average_token_length, num_keywords, kw_avg_avg, self_reference_avg_sharess, LDA_04, global_subjectivity, global_sentiment_polarity, avg_positive_polarity, avg_negative_polarity, shares)
@@ -266,11 +265,11 @@ Test <- newsTest %>%
 #Train
 ```
 
-# Model
+## Model
 
 - **Linear Regression Model**
 
-First, we have fitted a forward stepwise linear regression model for the training dataset. The data is centered and scaled and number of shares is the response variable.
+First, we fit a forward stepwise linear regression model for the training dataset. The data is centered and scaled and number of shares is the response variable.
 ```{r}
 #forward stepwise
 set.seed(111)
@@ -282,7 +281,7 @@ fwFit <- train(shares ~ ., data = Train,
 fwFit
 ```
 
-Then we have fitted a backward stepwise linear regression model for the training dataset. The data is centered and scaled and number of shares is the response variable.
+We also fit a backward stepwise linear regression model for the training dataset. The data is centered and scaled and number of shares is the response variable.
 ```{r}
 #backward stepwise
 set.seed(111)
@@ -294,7 +293,7 @@ bwFit <- train(shares ~ ., data = Train,
 bwFit
 ```
 
-We also fit a linear regression model with all predictors.
+Then we fit a linear regression model with all predictors.
 ```{r}
 #with all predictors
 set.seed(111)
@@ -336,7 +335,7 @@ boostedFit <- train(shares ~ .,
 boostedFit
 ```
 
-# Comparison
+## Comparison
 
 All the models are compared by RMSE on the test set.
 ```{r}
@@ -360,11 +359,11 @@ tibble(model = c("Forward",
                 random_mod[1],
                 boosted_mod[1]))
 ```
-From above comparison, we can see that the forward and backward have the same RMSE, which is the smallest during these models. Therefore, we will choose this linear regression model with 3 predictors.
+From the above table, we can find that forward and backward stepwise models have the same RMSE value. So we can say that, among these models, the best model is forward or backward stepwise model since it has the least RMSE value as compared to the other models.
 
-# Automation
+## Automation
 
-For this automation part, we want to produce the similar reports for each news channels. We firstly create a set of parameters, which match with 6 news channels. Then read the parameter and subset the data with the specified channel. After everything is ready, run the below chunk of code in the console, we will automatically get the reports for each news channel.
+For this automation part, we want to produce the similar reports for each news channels. We firstly create a set of parameters, which match with 6 channels. Then read the parameter and subset the data with the specified channel. After everything is ready, run the below chunk of code in the console, we will automatically get the reports for each news channel.
 
 ```{r, include=TRUE, eval=FALSE}
 #create channel names
@@ -377,13 +376,13 @@ params = lapply(channelID, FUN = function(x){list(channelID = x)})
 reports <- tibble(output_file, params)
 #render code
 apply(reports, MARGIN = 1,
-          FUN = function(x){
-             rmarkdown::render(input = "project3.Rmd",
-             output_format = "github_document",
-             output_file = x[[1]],
-             params = x[[2]],
-             output_options = list(toc=TRUE, toc_depth=1, toc_float=TRUE))
-             })
+      FUN = function(x){
+        rmarkdown::render(input = "project3.Rmd",
+                          output_format = "github_document",
+                          output_file = x[[1]],
+                          params = x[[2]],
+                          output_options = list(toc=TRUE, toc_depth=2, toc_float=TRUE))
+        })
 ```
 
 
