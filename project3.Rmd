@@ -384,8 +384,13 @@ tibble(model = c("Forward",
                 lr_mod[1],
                 random_mod[1],
                 boosted_mod[1]))
+
+result_table
+min_value <- min(result_table$RMSE)
+best_model <- result_table[result_table$RMSE == min_value, "model"]
+
+print(paste0("The best model based on the lowest RMSE value is ",as.character(best_model[1,1])," with an RMSE value of ",as.character(round(min_value,2))))
 ```
-From the above table, we can find that forward and backward stepwise models have the same RMSE value. So we can say that, among these models, the best model is forward or backward stepwise model since it has the least RMSE value as compared to the other models.
 
 ## Automation
 
