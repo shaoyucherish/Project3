@@ -3,7 +3,10 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-# The Analysis for bus Data Channel
+- <a href="#analysis-for-bus-data-channel"
+  id="toc-analysis-for-bus-data-channel">Analysis for bus Data Channel</a>
+
+# Analysis for bus Data Channel
 
 ## Introduction
 

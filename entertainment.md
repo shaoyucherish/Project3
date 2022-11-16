@@ -3,7 +3,11 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-# The Analysis for entertainment Data Channel
+- <a href="#analysis-for-entertainment-data-channel"
+  id="toc-analysis-for-entertainment-data-channel">Analysis for
+  entertainment Data Channel</a>
+
+# Analysis for entertainment Data Channel
 
 ## Introduction
 

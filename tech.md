@@ -3,7 +3,11 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-# The Analysis for tech Data Channel
+- <a href="#analysis-for-tech-data-channel"
+  id="toc-analysis-for-tech-data-channel">Analysis for tech Data
+  Channel</a>
+
+# Analysis for tech Data Channel
 
 ## Introduction
 
