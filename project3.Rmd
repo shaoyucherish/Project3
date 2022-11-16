@@ -11,7 +11,7 @@ params:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# The Analysis for `r params[[1]]` Data Channel
+# Analysis for `r params[[1]]` Data Channel
 
 ## Introduction
 

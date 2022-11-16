@@ -3,7 +3,7 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-# The Analysis for lifestyle Data Channel
+# Analysis for lifestyle Data Channel
 
 ## Introduction
 
