@@ -53,7 +53,6 @@ We need to load the required packages:
 # Load libraries
 library(readr)
 library(tidyverse)
-library(dplyr)
 library(caret)
 library(leaps)
 library(ggplot2)
