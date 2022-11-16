@@ -21,9 +21,33 @@ statistics and plots about the training data, at last we fit linear
 regression models and ensemble tree-based models and test the
 predictions.
 
-## Required Packages
+**Variable information**
 
-First, we need to load the required packages:
+The target variable is the following:  
+- `shares`: Number of shares
+
+The predictive variables are the following:  
+- `publish_weekday`: The article published day  
+- `n_tokens_title`: Number of words in the title  
+- `n_tokens_content`: Number of words in the content  
+- `num_self_hrefs`: Number of links to other articles published by
+Mashable  
+- `num_imgs`: Number of images  
+- `num_videos`: Number of videos  
+- `average_token_length`: Average length of the words in the content  
+- `num_keywords`: Number of keywords in the metadata  
+- `kw_avg_avg`: Avg. keyword (avg. shares)  
+- `self_reference_avg_sharess`: Avg. shares of referenced articles in
+Mashable  
+- `LDA_04`: Closeness to LDA topic 4  
+- `global_subjectivity`: Text subjectivity  
+- `global_sentiment_polarity`: Text sentiment polarity  
+- `avg_positive_polarity`: Avg. polarity of positive words  
+- `avg_negative_polarity`: Avg. polarity of negative words
+
+**Required packages**
+
+We need to load the required packages:
 
 ``` r
 # Load libraries
@@ -101,7 +125,7 @@ newsTest <- news[-trainIndex,]
 For this part, we produce some basic summary statistics and plots about
 the training data.
 
-- **Tables**
+**Tables**
 
 Firstly, here is a quick summary of all variables as shown below, so
 that we can know the variables roughly.
@@ -329,7 +353,7 @@ table(newsTrain$subject_activity_type)
     ##   High    Low Medium 
     ##    161    930    381
 
-- **Plots**
+**Plots**
 
 At the beginning, let’s plot the correlation between the numeric
 variables.
@@ -523,6 +547,8 @@ g + geom_point() +
 The plot above shows that the title subjectivity has less effect on the
 number of shares.
 
+**Select variables**
+
 Through the analysis above, we will select predictors as follows:  
 - `publish_weekday`: The article published day  
 - `n_tokens_title`: Number of words in the title  
@@ -542,6 +568,8 @@ Mashable
 - `avg_positive_polarity`: Avg. polarity of positive words  
 - `avg_negative_polarity`: Avg. polarity of negative words
 
+The target variable is `shares`.
+
 ``` r
 #select variables for training set and test set
 set.seed(111)
@@ -554,7 +582,7 @@ Test <- newsTest %>%
 
 ## Model
 
-- **Linear Regression Model**
+**Linear Regression Model**
 
 First, we fit a forward stepwise linear regression model for the
 training dataset. The data is centered and scaled and number of shares
@@ -648,7 +676,7 @@ lrFit
     ## 
     ## Tuning parameter 'intercept' was held constant at a value of TRUE
 
-- **Random Forest Model**
+**Random Forest Model**
 
 Next, we have fitted a random forest model which is an example of an
 ensemble based-tree model. Instead of traditional decision trees, a
@@ -681,7 +709,7 @@ randomFit
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 5.333333
 
-- **Boosted Tree Model**
+**Boosted Tree Model**
 
 Moreover, we have fitted a boosted tree model which is another ensemble
 based-tree model. Boosted tree models are combination of two techniques:
