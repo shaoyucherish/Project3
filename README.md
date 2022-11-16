@@ -9,7 +9,6 @@ This repo was created by Shaoyu Wang and Aniket Walimbe as a part of Project 3 f
 
 - readr
 - tidyverse
-- dplyr
 - caret
 - leaps
 - ggplot2
