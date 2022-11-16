@@ -29,7 +29,7 @@ Shaoyu Wang, Aniket Walimbe
 [Tech](https://github.com/shaoyucherish/Project3/blob/main/tech.html)  
 [World](https://github.com/shaoyucherish/Project3/blob/main/world.html)  
 
-# Automation
+# Automatically generate analysis reports
 
 ``` r
 #create channel names
