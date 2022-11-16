@@ -1,5 +1,3 @@
-Project 3
-================
 Shaoyu Wang, Aniket Walimbe
 2022-11-14
 
@@ -16,8 +14,8 @@ The purpose of this repo
 - leaps
 - ggplot2
 - corrplot
-- GGally
 - randomForest
+- rmarkdown
 
 # Links to the analyses
 
