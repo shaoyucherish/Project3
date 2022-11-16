@@ -22,11 +22,11 @@ The purpose of this repo
 # Links to the analyses
 
 - The analysis for [Lifestyle](https://github.com/shaoyucherish/Project3/blob/main/lifestyle.html)  
-- The analysis for[Entertainment](https://github.com/shaoyucherish/Project3/blob/main/entertainment.html)  
-- The analysis for[Business](https://github.com/shaoyucherish/Project3/blob/main/bus.html)  
-- The analysis for[Social Media](https://github.com/shaoyucherish/Project3/blob/main/socmed.html)  
-- The analysis for[Tech](https://github.com/shaoyucherish/Project3/blob/main/tech.html)  
-- The analysis for[World](https://github.com/shaoyucherish/Project3/blob/main/world.html)  
+- The analysis for [Entertainment](https://github.com/shaoyucherish/Project3/blob/main/entertainment.html)  
+- The analysis for [Business](https://github.com/shaoyucherish/Project3/blob/main/bus.html)  
+- The analysis for [Social Media](https://github.com/shaoyucherish/Project3/blob/main/socmed.html)  
+- The analysis for [Tech](https://github.com/shaoyucherish/Project3/blob/main/tech.html)  
+- The analysis for [World](https://github.com/shaoyucherish/Project3/blob/main/world.html)  
 
 # Automatically generate analysis reports
 
