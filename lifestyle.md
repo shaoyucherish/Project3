@@ -3,10 +3,6 @@ Project 3
 Shaoyu Wang, Aniket Walimbe
 2022-11-16
 
-- <a href="#analysis-for-lifestyle-data-channel"
-  id="toc-analysis-for-lifestyle-data-channel">Analysis for lifestyle Data
-  Channel</a>
-
 # Analysis for lifestyle Data Channel
 
 ## Introduction
