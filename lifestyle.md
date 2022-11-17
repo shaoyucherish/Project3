@@ -363,7 +363,7 @@ correlation <- cor(newsTrainsub, method = "spearman")
 corrplot(correlation, tl.col = "black", tl.cex = 0.5)
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 From the correlation graph above, we can see that the following
 variables seem to be moderately correlated:  
@@ -402,7 +402,7 @@ g + geom_col(fill = "lightblue", color = "black") +
   labs(title = " Shares for articles published based on weekdays")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 Let’s select some variables as example to plot scatter plots.
 
@@ -416,7 +416,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of words in the title VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 We can inspect the trend of shares as a function of the number of words
 in the title. Therefore, we can see that the number of words in title
@@ -432,7 +432,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of words in the content VS Number of shares") 
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 From the plot above, we can easily see that the number of shares is
 decreasing while the the number of words in the content is increasing.
@@ -449,7 +449,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of links to other articles published by Mashable VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 The plot above shows that as the number of links to other articles
 increasing, the number of shares is decreasing. So the the number of
@@ -465,7 +465,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of images VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 The plot above shows that the number of shares decreases as the number
 of images increasing. Therefore, the number of images will affect the
@@ -481,7 +481,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of videos VS Number of shares") 
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 A scatter plot with the number of shares on the y-axis and the average
 length of words in content on the x-axis is created:
@@ -493,7 +493,7 @@ g + geom_point() +
        title = "Scatter Plot: Average token length VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Through the plot above, we can see that the most of shares are between 4
 and 6 words. The average token length will also affect the number of
@@ -509,7 +509,7 @@ g + geom_point() +
        title = "Scatter Plot: Number of keywords in the metadata VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 According to the plot above, we can find that as the number of keywords
 increasing, the number of shares is increasing. So the number of
@@ -525,7 +525,7 @@ g + geom_point() +
        title = "Scatter Plot: Text subjectivity VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 From the plot above, it presents that the most of shares are between
 0.25 and 0.75 text subjectivity. So the text subjectivity will influence
@@ -541,7 +541,7 @@ g + geom_point() +
        title = "Scatter Plot: Title subjectivity VS Number of shares")
 ```
 
-![](lifestyle_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 The plot above shows that the title subjectivity has less effect on the
 number of shares.
