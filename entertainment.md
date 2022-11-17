@@ -116,7 +116,6 @@ set.seed(111)
 trainIndex <- createDataPartition(news$shares, p = 0.7, list = FALSE)
 newsTrain <- news[trainIndex,]
 newsTest <- news[-trainIndex,]
-#newsTrain
 ```
 
 ## Summarizations
@@ -590,7 +589,6 @@ fwFit <- train(shares ~ ., data = Train,
                method = "leapForward",
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv", number = 5))
-#summary(fwFit)
 fwFit
 ```
 
@@ -623,7 +621,6 @@ bwFit <- train(shares ~ ., data = Train,
                method = "leapBackward",
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv", number = 5))
-#summary(bwFit)
 bwFit
 ```
 
